@@ -4,19 +4,17 @@ import java.util.List;
 public class GameManager {
 	public int playerCount = 0;
 	public List<Player> playerList;
-	// game state 0 is waiting
-	// game state 1 is playing
 	public int gameState = 0;
 	
 	public GameManager() {
 		playerList = new ArrayList<>();
 	}
 	
-	public Player addNewPlayer() {
-		playerCount++;
-		// todo determine player position based on player count
-		Player newPlayer = new Player(playerCount, playerCount, 0, 0);
+	public Player addNewPlayer() throws Exception {
+		int[] playerPos = getInitialPosition(playerCount);
+		Player newPlayer = new Player(playerCount, playerCount, playerPos[0], playerPos[1]);
 		playerList.add(newPlayer);
+		playerCount++;
 		return newPlayer;
 	}
 	
@@ -27,5 +25,20 @@ public class GameManager {
 	public void reset() {
 		playerCount = 0;
 		playerList = new ArrayList<>();
+	}
+	
+	public int[] getInitialPosition(int playerId) throws Exception {
+		switch(playerId) {
+		case 0:
+			return new int[] {0, 0};
+		case 1:
+			return new int[] {0, 39};
+		case 2:
+			return new int[] {39, 0};
+		case 3:
+			return new int[] {39, 39};
+		default:
+			throw new Exception("Invalid player id.");
+		}
 	}
 }
