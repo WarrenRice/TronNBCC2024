@@ -5,6 +5,7 @@ public class GameManager {
 	public int playerCount = 0;
 	public List<Player> playerList;
 	public int gameState = 0;
+	public static final String PROPERTY_DELIMETER = "▐";
 	
 	public GameManager() {
 		playerList = new ArrayList<>();
@@ -40,5 +41,19 @@ public class GameManager {
 		default:
 			throw new Exception("Invalid player id.");
 		}
+	}
+	
+	public String getAllPlayerPositions() {
+		String positions = "";
+		for (Player p : playerList) {
+			positions += p.getPosition() + PROPERTY_DELIMETER;
+		}
+		return positions;
+	}
+	
+	public void savePlayerPosition(int playerId, int posX, int posY) {
+		Player player = playerList.get(playerId);
+		player.setPosX(posX);
+		player.setPosY(posY);
 	}
 }

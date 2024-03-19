@@ -40,16 +40,14 @@ public class Player {
 	}
 	
 	public String getPosition() {
-		return posX + PROPERTY_DELIMETER +
-				posY + PROPERTY_DELIMETER;
+		return posX + "," +
+				posY;
 	}
 	
 	public String toString() {
 		return playerId + PROPERTY_DELIMETER + 
-				color + PROPERTY_DELIMETER + 
-				posX + PROPERTY_DELIMETER +
-				posY + PROPERTY_DELIMETER +
-				alive;
+				getPosition() + PROPERTY_DELIMETER +
+				posY + PROPERTY_DELIMETER;
 	}
 	
 }

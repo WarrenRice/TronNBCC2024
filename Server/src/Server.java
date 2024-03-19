@@ -57,6 +57,9 @@ public class Server extends Thread {
 			if (clientInput.equals("CONNECT")) {
 				return gameManager.addNewPlayer().toString();
 			}
+			if (clientInput.equals("GET_POSITIONS")) {
+				return gameManager.getAllPlayerPositions();
+			}
 			if (clientInput.contains("GET_POSITION")) {
 				String playerId = clientInput.split(PROPERTY_DELIMETER)[1];
 				return gameManager.getPlayerPosition(playerId);
@@ -64,6 +67,14 @@ public class Server extends Thread {
 			if (clientInput.equals("RESET")) {
 				gameManager.reset();
 				return "Successfully reset the game server.";
+			}
+			if (clientInput.contains("SAVE_POSITION")) {
+				String[] splitInput = clientInput.split(PROPERTY_DELIMETER);
+				int playerId = Integer.parseInt(splitInput[1]);
+				int posX = Integer.parseInt(splitInput[2]);
+				int posY = Integer.parseInt(splitInput[3]);
+				gameManager.savePlayerPosition(playerId, posX, posY);
+				return "Successully saved the position";
 			}
 			throw new Exception("Invalid client input...");
 		} catch (Exception e) {
