@@ -1,6 +1,9 @@
 import pygame, sys, random, socket
 from pygame.math import Vector2
 
+
+PROPERTY_DELIMETER = "▐";
+
 class PLAYER:
     def __init__(self):
         #self.bodys = [Vector2(19,38),Vector2(19,39)]
