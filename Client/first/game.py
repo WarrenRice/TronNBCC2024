@@ -1,36 +1,14 @@
 import pygame, sys, random, socket
 from pygame.math import Vector2
+from first.player import PLAYER
 
 PROPERTY_DELIMETER = "▐";
 
-class PLAYER:
-    def __init__(self):
-        #self.bodys = [Vector2(19,38),Vector2(19,39)]
-        self.pos = Vector2(19,39)
-        self.direction = Vector2(0,-1)
+# Access arguments
+arguments = sys.argv[1:]  # Exclude the first argument, which is the script filename
 
-    def draw(self):
-        xPos = int(self.pos.x*cellSize)
-        yPos = int(self.pos.y*cellSize)
-        bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-        pygame.draw.rect(screen,(255,0,0), bodyRect)
-
-        '''
-        for body in self.bodys:
-            xPos = int(body.x*cellSize)
-            yPos = int(body.y*cellSize)
-            bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-
-            pygame.draw.rect(screen,(255,0,0), bodyRect)
-        '''
-        
-    def move(self):
-        #bodysCopy = self.bodys[:]
-        #bodysCopy.insert(0,bodysCopy[0] + self.direction)
-        #self.bodys = bodysCopy[:]
-        self.pos = self.pos + self.direction
-
-        
+# Use arguments as needed
+print("Arguments:", arguments)
 
 class MAP:
     def __init__(self, size):
@@ -87,25 +65,27 @@ class MAP:
 class MAIN:
 
     def __init__(self, size):
-        self.player = PLAYER()
+        self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]))
         self.map = MAP(size)
+        
+        
     
     def update(self):
         self.player.move()
         self.checkCollision()
         self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
 
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+        #client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
 
         #message = "Player position: {},{}".format(int(mainGame.player.pos.x), int(mainGame.player.pos.y))
-        message = "CONNECT\n"
-        client_socket.sendall(message.encode())
+        #message = "CONNECT\n"
+        #client_socket.sendall(message.encode())
         
-        data = client_socket.recv(1024)
-        print(data.decode())
+        #data = client_socket.recv(1024)
+        #print(data.decode())
         
-        client_socket.close()
+        #client_socket.close()
 
         self.map.setValue(19,0,2)
         self.map.setValue(19,1,2)
@@ -155,7 +135,7 @@ class MAIN:
         #self.map.printMap()
 
     def draw(self):
-        self.player.draw()
+        self.player.draw(screen,cellSize)
         self.map.drawMap()
 
     def checkCollision(self):

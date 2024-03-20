@@ -1,7 +1,8 @@
 import socket
 import sys
 import pygame
-
+import subprocess
+from first.player import PLAYER
 
 # Initialize Pygame
 pygame.init()
@@ -33,7 +34,7 @@ GREEN = (0, 255, 0)
 BLUE = (75, 75, 255)
 YELLOW = (255, 255, 0)
 
-id = 0
+id = -1
 posX = -1
 posY = -1
 
@@ -43,7 +44,7 @@ def draw_text(ip_text, ip_color, x, y):
 
 
 def get_players_status(ip, port):
-    global id;
+    global id, start_game;
     try:
 
         # Create a socket object
@@ -86,8 +87,15 @@ def get_players_status(ip, port):
         screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
         screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
         screen.blit(green_tick_image if split_data[2][0] == "R" else red_tick_image, (670, 460))  
-        screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500)) 
-
+        screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500))
+        
+        start_game = all(sublist[0] == "R" for sublist in split_data)
+        
+        print(start_game)
+        
+        #print(all(sublist[0] == "R" for sublist in split_data))
+        
+        
         client_socket.close()
        
     except Exception as e:
@@ -200,6 +208,7 @@ def main():
     state = "start"
     connect = False
     ready = False
+    start_game = False
 
 
     ip_input_box = pygame.Rect(250, 345, 140, 36)
@@ -208,6 +217,7 @@ def main():
     ip_color = ip_color_inactive
     ip_active = False
     ip_text = '25.42.224.13'
+    ip_text = 'localhost'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
@@ -336,6 +346,13 @@ def main():
             draw_text(ready_button_text, ready_button_text_color, 800, 710)
 
             get_players_status(ip_text, int(port_text))
+            
+        #elif start_game == True:
+            arguments = [ str(id) , str(posX) , str(posY) ]
+            
+            subprocess.Popen(["python", "game.py"] + arguments)
+            pygame.quit()
+            sys.exit()
 
         # Update the display
         pygame.display.flip()
