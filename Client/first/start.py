@@ -79,9 +79,9 @@ def get_players_status(ip, port):
         
         
         draw_text("you" if id == 0 else "Player 1", RED, 500, 380)
-        draw_text("you" if id == 1 else "Player 2", GREEN, 500, 420)
-        draw_text("you" if id == 2 else "Player 3", BLUE, 500, 460)
-        draw_text("you" if id == 3 else "Player 4", YELLOW, 500, 500)
+        draw_text("you" if id == 1 else "Player 2", GREEN if len(split_data) > 1 else BLACK, 500, 420)
+        draw_text("you" if id == 2 else "Player 3", BLUE if len(split_data) > 2 else BLACK, 500, 460)
+        draw_text("you" if id == 3 else "Player 4", YELLOW if len(split_data) > 3 else BLACK, 500, 500)
 
         screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
         screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
