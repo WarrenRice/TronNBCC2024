@@ -35,8 +35,6 @@ public class Server extends Thread {
 	            
 				String serverOutput = handleClientInput(clientInput);
 	            
-				serverOutput = "test";
-				
 				System.out.println(serverOutput);
 	            
 				System.out.println("=================================");
@@ -62,7 +60,7 @@ public class Server extends Thread {
 			if (clientInput.equals("GET_PLAYERS")) {
 				return gameManager.getPlayerLobbyStatus();
 			}
-			if (clientInput.equals("READY")) {
+			if (clientInput.contains("READY")) {
 				String playerId = clientInput.split(PROPERTY_DELIMETER)[1];
 				gameManager.setPlayerReady(Integer.parseInt(playerId));
 				return "Player " + playerId + "is now ready.";
