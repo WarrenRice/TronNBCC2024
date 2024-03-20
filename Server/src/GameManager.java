@@ -56,4 +56,18 @@ public class GameManager {
 		player.setPosX(posX);
 		player.setPosY(posY);
 	}
+	
+	// function for obtaining lobby status of players
+	public String getPlayerLobbyStatus() {
+		String playerStatus = "";
+		for (Player p : playerList) {
+			playerStatus += p.getLobbyStatus() + PROPERTY_DELIMETER;
+		}
+		
+		return playerStatus;
+	}
+	
+	public void setPlayerReady(int playerId) {
+		playerList.get(playerId).setReady(true);
+	}
 }

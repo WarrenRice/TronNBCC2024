@@ -4,6 +4,7 @@ public class Player {
 	private int color;
 	private int posX;
 	private int posY;
+	private boolean ready;
 	private boolean alive;
 	public static final String PROPERTY_DELIMETER = "▐";
 	
@@ -12,6 +13,7 @@ public class Player {
 		this.color = color;
 		this.posX = posX;
 		this.posY = posY;
+		this.ready = false;
 	}
 	
 	public int getPlayerId() {
@@ -39,6 +41,14 @@ public class Player {
 		this.posY = posY;
 	}
 	
+	public boolean getReady() {
+		return this.ready;
+	}
+	
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
+	
 	public String getPosition() {
 		return posX + "," +
 				posY;
@@ -46,8 +56,12 @@ public class Player {
 	
 	public String toString() {
 		return playerId + PROPERTY_DELIMETER + 
-				getPosition() + PROPERTY_DELIMETER +
-				posY + PROPERTY_DELIMETER;
+				getPosition();
+	}
+	
+	public String getLobbyStatus() {
+		String status = ready ? "R" : "N";
+		return status + "," + getPosition();
 	}
 	
 }
