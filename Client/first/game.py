@@ -1,4 +1,4 @@
-import pygame, sys, random
+import pygame, sys, random, socket
 from pygame.math import Vector2
 
 class PLAYER:
@@ -93,6 +93,18 @@ class MAIN:
         self.checkCollision()
         self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
 
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+
+        #message = "Player position: {},{}".format(int(mainGame.player.pos.x), int(mainGame.player.pos.y))
+        message = "CONNECT\n"
+        client_socket.sendall(message.encode())
+        
+        data = client_socket.recv(1024)
+        print(data.decode())
+        
+        client_socket.close()
+
         self.map.setValue(19,0,2)
         self.map.setValue(19,1,2)
         self.map.setValue(19,2,2)
@@ -136,7 +148,7 @@ class MAIN:
         self.map.setValue(8,16,4)
         self.map.setValue(9,16,4)
 
-
+        
 
         #self.map.printMap()
 
@@ -172,6 +184,9 @@ cellNumber = 40
 screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber))
 clock = pygame.time.Clock()
 
+# Set up networking
+SERVER_ADDRESS = '127.0.0.1'  # Change this to your server's IP address
+SERVER_PORT = 6066
 
 
 

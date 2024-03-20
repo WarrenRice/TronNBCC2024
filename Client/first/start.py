@@ -1,7 +1,10 @@
-import pygame
-import sys
-import subprocess
 import socket
+import subprocess
+import sys
+import threading
+
+import pygame
+
 
 # Initialize Pygame
 pygame.init()
@@ -32,8 +35,29 @@ def draw_text(ip_text, ip_color, x, y):
     ip_text_surface = font.render(ip_text, True, ip_color)
     screen.blit(ip_text_surface, (x, y))
 
+def receive_from_server(client_socket):
+    try:
+        while True:
+            # Receive data from the server
+            data = client_socket.recv(1024)
+            
+            # If no data received, break the loop
+            if not data:
+                break
+            
+            # Decode the received data
+            message = data.decode()
+            
+            # Print the message
+            print("Message from server:", message)
+            
+            
+    except Exception as e:
+        print("Error receiving message:", e)
+
 def connect_to_server(ip, port):
     try:
+
         # Create a socket object
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
@@ -42,13 +66,23 @@ def connect_to_server(ip, port):
         
         print("Connected to the server successfully!")
         
+        # Send player information to the server
+        text = "CONNECTED\n"
+        client_socket.sendall(text.encode())
+        
+        data = client_socket.recv(1024)
+        print(data.decode())
+        
+        # Start a new thread to receive messages from the server
+        #receive_thread = threading.Thread(target=receive_from_server, args=(client_socket,))
+        #receive_thread.start()
         
         client_socket.close()
         return True
         
     except Exception as e:
         print("Connection error:", e)
-        return False
+        return None
 
 def main():
     # Initialize variables
@@ -61,14 +95,14 @@ def main():
     ip_color_active = pygame.Color('yellow')
     ip_color = ip_color_inactive
     ip_active = False
-    ip_text = ''
+    ip_text = 'localhost'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
     port_color_active = pygame.Color('yellow')
     port_color = port_color_inactive
     port_active = False
-    port_text = ''
+    port_text = '6066'
     
     # Connect button
     connect_button_rect = pygame.Rect(50, 450, 200, 50)
@@ -121,12 +155,13 @@ def main():
                     ip_active = False
                 elif connect_button_rect.collidepoint(event.pos):
                     if ip_text and port_text:
-                        #if connect_to_server(ip_text, int(port_text)):
-                        state = "connected"
-                        connect = True
-                        connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
-                        connect_button_text = "Connected"
-                        connect_button_text_color = BLACK
+                        if connect_to_server(ip_text, int(port_text)):
+                            state = "connected"
+                            connect = True
+                            connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
+                            connect_button_text = "Connected"
+                            connect_button_text_color = BLACK
+
                         
                 elif ready_button_rect.collidepoint(event.pos):
                         if state == "connected":
