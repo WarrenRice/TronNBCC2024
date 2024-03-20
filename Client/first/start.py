@@ -67,7 +67,7 @@ def connect_to_server(ip, port):
         print("Connected to the server successfully!")
         
         # Send player information to the server
-        text = "CONNECTED\n"
+        text = "CONNECTION\n"
         client_socket.sendall(text.encode())
         
         data = client_socket.recv(1024)
@@ -95,7 +95,7 @@ def main():
     ip_color_active = pygame.Color('yellow')
     ip_color = ip_color_inactive
     ip_active = False
-    ip_text = 'localhost'
+    ip_text = '25.42.224.13'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
@@ -137,7 +137,13 @@ def main():
         screen.blit(txt_surface, (port_input_box.x+5, port_input_box.y+5))
         pygame.draw.rect(screen, port_color, port_input_box, 2)
         
-        # Draw Connect Button
+        draw_text("LOBBY ", WHITE, 500, 340)
+        draw_text("STATUS ", WHITE, 640, 340)
+        draw_text("Player 1", WHITE, 500, 380)
+        draw_text("Player 2", WHITE, 500, 420)
+        draw_text("Player 3", WHITE, 500, 460)
+        draw_text("Player 4", WHITE, 500, 500)
+        # Draw Connect Button5
         pygame.draw.rect(screen, connect_button_color, connect_button_rect)
         draw_text(connect_button_text, connect_button_text_color, 100, 460)
 
