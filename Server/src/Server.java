@@ -35,6 +35,8 @@ public class Server extends Thread {
 	            
 				String serverOutput = handleClientInput(clientInput);
 	            
+				serverOutput = "test";
+				
 				System.out.println(serverOutput);
 	            
 				System.out.println("=================================");
