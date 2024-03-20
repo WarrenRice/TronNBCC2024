@@ -1,8 +1,5 @@
 import socket
-import subprocess
 import sys
-import threading
-
 import pygame
 
 
@@ -30,6 +27,7 @@ font = pygame.font.Font(None, 36)
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (75, 75, 255)
@@ -49,7 +47,7 @@ def get_players_status(ip, port):
     try:
 
         # Create a socket object
-        '''
+
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         # Connect to the server
@@ -65,10 +63,7 @@ def get_players_status(ip, port):
         print(data.decode())
         
         string_data = data.decode()
-        '''
-        
-        
-        string_data = "N,0,0▐A,0,39▐B,39,0▐N,39,39▐"
+
         
         # Split the string using the separator '▐'
         split_data = string_data.split('▐')
@@ -76,8 +71,8 @@ def get_players_status(ip, port):
         # Split each substring by ','
         split_data = [sub.split(',') for sub in split_data if sub]  # Exclude empty strings
         
-        print(split_data)
-            
+        # Remove the last element from the list
+        split_data = split_data[:-1]
         
         draw_text("LOBBY ", WHITE, 500, 340)
         draw_text("STATUS ", WHITE, 640, 340)
@@ -88,17 +83,12 @@ def get_players_status(ip, port):
         draw_text("you" if id == 2 else "Player 3", BLUE, 500, 460)
         draw_text("you" if id == 3 else "Player 4", YELLOW, 500, 500)
 
-        screen.blit(red_tick_image, (670, 380))  
-        screen.blit(red_tick_image, (670, 420)) 
-        screen.blit(red_tick_image, (670, 460))  
-        screen.blit(red_tick_image, (670, 500)) 
+        screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
+        screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
+        screen.blit(green_tick_image if split_data[2][0] == "R" else red_tick_image, (670, 460))  
+        screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500)) 
 
-        
-        # Start a new thread to receive messages from the server
-        #receive_thread = threading.Thread(target=receive_from_server, args=(client_socket,))
-        #receive_thread.start()
-        
-        '''client_socket.close()'''
+        client_socket.close()
        
     except Exception as e:
         print("Connection error:", e)
@@ -116,14 +106,11 @@ def set_ready(ip, port):
         
         # Send player information to the server
         text = "READY" + PROPERTY_DELIMETER + str(id) + "\n"
+        print(text)
         client_socket.sendall(text.encode())
         
         data = client_socket.recv(1024)
         print(data.decode())
-        
-        # Start a new thread to receive messages from the server
-        #receive_thread = threading.Thread(target=receive_from_server, args=(client_socket,))
-        #receive_thread.start()
         
         client_socket.close()
         return True
@@ -181,6 +168,30 @@ def connect_to_server(ip, port):
     except Exception as e:
         print("Connection error:", e)
         return None
+    
+def reset_server(ip, port):
+    try:
+
+        # Create a socket object
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        # Connect to the server
+        client_socket.connect((ip, port))
+        
+        print("Connected to the server successfully!")
+        
+        # Send player information to the server
+        text = "RESET\n"
+        #text = "RESET\n"
+        client_socket.sendall(text.encode())
+
+        data = client_socket.recv(1024)
+        print(data.decode())
+
+        client_socket.close()
+        
+    except Exception as e:
+        print("Connection error:", e)
 
 def main():
     global id, posX, posY
@@ -217,6 +228,13 @@ def main():
     ready_button_text = "Ready"
     ready_button_text_color = WHITE
     
+    
+    # Reset button
+    reset_button_rect = pygame.Rect(50, 700, 200, 50)
+    reset_button_color = (0, 255, 0) if connect else (255, 0, 0)
+    reset_button_text = "Reset"
+    reset_button_text_color = WHITE
+    
     while True:
         # Draw the background image
         screen.fill(BLACK)
@@ -241,6 +259,9 @@ def main():
         # Draw Connect Button5
         pygame.draw.rect(screen, connect_button_color, connect_button_rect)
         draw_text(connect_button_text, connect_button_text_color, 100, 460)
+        
+        pygame.draw.rect(screen, reset_button_color, reset_button_rect)
+        draw_text(reset_button_text, reset_button_text_color, 100, 710)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -254,6 +275,10 @@ def main():
                 elif port_input_box.collidepoint(event.pos):
                     port_active = not port_active
                     ip_active = False
+                    
+                elif reset_button_rect.collidepoint(event.pos):
+                    reset_server(ip_text, int(port_text))
+                
                 elif connect_button_rect.collidepoint(event.pos):
                     if ip_text and port_text and connect == False:
                         if connect_to_server(ip_text, int(port_text)):
@@ -269,6 +294,7 @@ def main():
                             state = "ready"
                             
                             set_ready(ip_text, int(port_text))
+                            get_players_status(ip_text, int(port_text))
                             
                             ready = True
                             ready_button_color = (0, 255, 0) if ready else (255, 0, 0)
@@ -308,13 +334,8 @@ def main():
             # Draw Ready Button
             pygame.draw.rect(screen, ready_button_color, ready_button_rect)
             draw_text(ready_button_text, ready_button_text_color, 800, 710)
-            
-            screen.blit(green_tick_image, (670, 380))  # Top-left
-            screen.blit(red_tick_image, (670, 420))  # Top-right
-            screen.blit(green_tick_image, (670, 460))  # Bottom-left
-            screen.blit(red_tick_image, (670, 500))  # Bottom-right
 
-
+            get_players_status(ip_text, int(port_text))
 
         # Update the display
         pygame.display.flip()
