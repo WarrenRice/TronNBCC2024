@@ -216,7 +216,7 @@ def main():
     ip_color = ip_color_inactive
     ip_active = False
     ip_text = '25.42.224.13'
-    ip_text = 'localhost'
+    #ip_text = 'localhost'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
