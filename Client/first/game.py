@@ -1,6 +1,7 @@
 import pygame, sys, random, socket
 from pygame.math import Vector2
 from first.player import PLAYER
+from first.map import MAP
 
 PROPERTY_DELIMETER = "▐";
 
@@ -10,151 +11,136 @@ arguments = sys.argv[1:]  # Exclude the first argument, which is the script file
 # Use arguments as needed
 print("Arguments:", arguments)
 
-class MAP:
-    def __init__(self, size):
-        self.size = size
-        self.map = [[0] * size for _ in range(size)]
-
-    def setValue(self, x, y, value):
-        if 0 <= x < self.size and 0 <= y < self.size:
-            self.map[x][y] = value
-        else:
-            raise IndexError("Coordinates out of bounds")
-
-    def getValue(self, x, y):
-        if 0 <= x < self.size and 0 <= y < self.size:
-            return self.map[x][y]
-        else:
-            raise IndexError("Coordinates out of bounds")
-
-    def printMap(self):
-        for row in range(self.size):
-            line = ""
-            for col in range(self.size):
-                line = line + " " + str(self.map[col][row])
-            print(line)
-
-    def drawMap(self):
-        for row in range(self.size):
-            for col in range(self.size):
-                if self.map[col][row] == 1:
-                    xPos = int(col*cellSize)
-                    yPos = int(row*cellSize)
-                    bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-
-                    pygame.draw.rect(screen,(255,0,0), bodyRect)
-                elif self.map[col][row] == 2:
-                    xPos = int(col*cellSize)
-                    yPos = int(row*cellSize)
-                    bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-
-                    pygame.draw.rect(screen,(0,255,0), bodyRect)
-                elif self.map[col][row] == 3:
-                    xPos = int(col*cellSize)
-                    yPos = int(row*cellSize)
-                    bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-
-                    pygame.draw.rect(screen,(0,0,255), bodyRect)
-                elif self.map[col][row] == 4:
-                    xPos = int(col*cellSize)
-                    yPos = int(row*cellSize)
-                    bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
-
-                    pygame.draw.rect(screen,(0,255,255), bodyRect)
 
 class MAIN:
-
     def __init__(self, size):
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]))
         self.map = MAP(size)
         
-        
-    
     def update(self):
-        self.player.move()
-        self.checkCollision()
-        self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
-
-        #client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
-
-        #message = "Player position: {},{}".format(int(mainGame.player.pos.x), int(mainGame.player.pos.y))
-        #message = "CONNECT\n"
-        #client_socket.sendall(message.encode())
-        
-        #data = client_socket.recv(1024)
-        #print(data.decode())
-        
-        #client_socket.close()
-
-        self.map.setValue(19,0,2)
-        self.map.setValue(19,1,2)
-        self.map.setValue(19,2,2)
-        self.map.setValue(19,3,2)
-        self.map.setValue(20,3,2)
-        self.map.setValue(21,3,2)
-        self.map.setValue(22,3,2)
-        self.map.setValue(22,4,2)
-        self.map.setValue(22,5,2)
-        self.map.setValue(22,6,2)
-        self.map.setValue(22,7,2)
-        self.map.setValue(23,7,2)
-        self.map.setValue(24,7,2)
-
-
-        self.map.setValue(39,19,3)
-        self.map.setValue(38,19,3)
-        self.map.setValue(37,19,3)
-        self.map.setValue(36,19,3)
-        self.map.setValue(35,19,3)
-        self.map.setValue(35,20,3)
-        self.map.setValue(35,21,3)
-        self.map.setValue(35,22,3)
-        self.map.setValue(35,23,3)
-        self.map.setValue(35,24,3)
-        self.map.setValue(35,25,3)
-        self.map.setValue(35,26,3)
-
-
-        self.map.setValue(0,19,4)
-        self.map.setValue(1,19,4)
-        self.map.setValue(2,19,4)
-        self.map.setValue(3,19,4)
-        self.map.setValue(4,19,4)
-        self.map.setValue(5,19,4)
-        self.map.setValue(6,19,4)
-        self.map.setValue(7,19,4)
-        self.map.setValue(8,19,4)
-        self.map.setValue(8,18,4)
-        self.map.setValue(8,17,4)
-        self.map.setValue(8,16,4)
-        self.map.setValue(9,16,4)
-
-        
-
-        #self.map.printMap()
+        if self.player.alive:
+            self.player.move() #update position
+    
+            try:
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+    
+                message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + "\n"
+                client_socket.sendall(message.encode())
+                data = client_socket.recv(1024)
+                
+                print(data.decode())
+            
+                client_socket.close()
+            
+            except Exception as e:
+                print("Connection error:", e)
+    
+            try:
+                self.checkCollision()
+                if (self.player.pos.x < self.map.size and self.player.pos.y < self.map.size):
+                    self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
+            except Exception as e:
+                print("Main update error:", e)
+    
+            
+    
+    
+            self.map.setValue(19,0,2)
+            self.map.setValue(19,1,2)
+            self.map.setValue(19,2,2)
+            self.map.setValue(19,3,2)
+            self.map.setValue(20,3,2)
+            self.map.setValue(21,3,2)
+            self.map.setValue(22,3,2)
+            self.map.setValue(22,4,2)
+            self.map.setValue(22,5,2)
+            self.map.setValue(22,6,2)
+            self.map.setValue(22,7,2)
+            self.map.setValue(23,7,2)
+            self.map.setValue(24,7,2)
+    
+    
+            self.map.setValue(39,19,3)
+            self.map.setValue(38,19,3)
+            self.map.setValue(37,19,3)
+            self.map.setValue(36,19,3)
+            self.map.setValue(35,19,3)
+            self.map.setValue(35,20,3)
+            self.map.setValue(35,21,3)
+            self.map.setValue(35,22,3)
+            self.map.setValue(35,23,3)
+            self.map.setValue(35,24,3)
+            self.map.setValue(35,25,3)
+            self.map.setValue(35,26,3)
+    
+    
+            self.map.setValue(0,19,4)
+            self.map.setValue(1,19,4)
+            self.map.setValue(2,19,4)
+            self.map.setValue(3,19,4)
+            self.map.setValue(4,19,4)
+            self.map.setValue(5,19,4)
+            self.map.setValue(6,19,4)
+            self.map.setValue(7,19,4)
+            self.map.setValue(8,19,4)
+            self.map.setValue(8,18,4)
+            self.map.setValue(8,17,4)
+            self.map.setValue(8,16,4)
+            self.map.setValue(9,16,4)
+    
+            
+    
+            #self.map.printMap()
 
     def draw(self):
         self.player.draw(screen,cellSize)
-        self.map.drawMap()
+        self.map.drawMap(screen,cellSize)
 
     def checkCollision(self):
-
-        if not 0 <= self.player.pos.x <= cellNumber or not 0 <= self.player.pos.y <= cellNumber :
-            self.gameOver()
-        
-        '''
-        for block in self.player.bodys[1:]:
-            if block == self.player.bodys[0]:
+        try:
+            if not (0 <= self.player.pos.x <= cellNumber) or not (0 <= self.player.pos.y <= cellNumber) :
+                self.player.alive = False
                 #self.gameOver()
-                pass
-        '''
+                self.set_dead()
+            else:
+                if not self.map.getValue(int(self.player.pos.x),int(self.player.pos.y)) == 0:
+                    self.player.alive = False
+                    #self.gameOver()
+                    self.set_dead()
+                    
+            '''
+            for block in self.player.bodys[1:]:
+                if block == self.player.bodys[0]:
+                    #self.gameOver()
+                    pass
+            '''
+        except Exception as e:
+            print("Collision error:", e)
 
-        if not self.map.getValue(int(self.player.pos.x),int(self.player.pos.y)) == 0:
-            self.gameOver()
+    def set_dead(self):
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
 
-
+            message = "DIE" + PROPERTY_DELIMETER + str(self.player.id) + "\n"
+            client_socket.sendall(message.encode())
+            data = client_socket.recv(1024)
+            
+            print(data.decode())
         
+            client_socket.close()
+        
+        except Exception as e:
+            print("Connection error:", e)
+
+        try:
+            self.checkCollision()
+            if (self.player.pos.x < self.map.size and self.player.pos.y < self.map.size):
+                self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
+        except Exception as e:
+            print("Main update error:", e)        
+    
     def gameOver(self):
         pygame.quit()
         sys.exit()

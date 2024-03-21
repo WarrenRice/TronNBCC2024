@@ -3,6 +3,7 @@ import sys
 import pygame
 import subprocess
 from first.player import PLAYER
+from first.gameColor import COLOR
 
 # Initialize Pygame
 pygame.init()
@@ -15,7 +16,7 @@ PROPERTY_DELIMETER = "▐";
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("-Tron Multiplayer Lobby-")
+pygame.display.set_caption("- Tron Multiplayer Lobby -")
 
 # Load images
 background_image = pygame.image.load("Tron2.jpg").convert()  # Replace "Tron2.jpg" with your actual image file path
@@ -28,11 +29,7 @@ font = pygame.font.Font(None, 36)
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (75, 75, 255)
-YELLOW = (255, 255, 0)
+use_color = COLOR()
 
 id = -1
 posX = -1
@@ -78,28 +75,33 @@ def get_players_status(ip, port):
         draw_text("LOBBY ", WHITE, 500, 340)
         draw_text("STATUS ", WHITE, 640, 340)
         
+        for _ in range(len(split_data)):
+            draw_text("you" if id == _ else ("Player" + str(_+1)), use_color[_], 500, 380+_*40)
+            screen.blit(green_tick_image if split_data[_][0] == "R" else red_tick_image, (670, 380+_*40))
         
-        draw_text("you" if id == 0 else "Player 1", RED, 500, 380)
-        draw_text("you" if id == 1 else "Player 2", GREEN if len(split_data) > 1 else BLACK, 500, 420)
-        draw_text("you" if id == 2 else "Player 3", BLUE if len(split_data) > 2 else BLACK, 500, 460)
-        draw_text("you" if id == 3 else "Player 4", YELLOW if len(split_data) > 3 else BLACK, 500, 500)
+        #draw_text("you" if id == 0 else "Player 1", use_color[0], 500, 380)
+        #draw_text("you" if id == 1 else "Player 2", use_color[1] if len(split_data) > 1 else BLACK, 500, 420)
+        #draw_text("you" if id == 2 else "Player 3", use_color[2] if len(split_data) > 2 else BLACK, 500, 460)
+        #draw_text("you" if id == 3 else "Player 4", use_color[3] if len(split_data) > 3 else BLACK, 500, 500)
 
-        screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
-        screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
-        screen.blit(green_tick_image if split_data[2][0] == "R" else red_tick_image, (670, 460))  
-        screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500))
+        #screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
+        #screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
+        #screen.blit(green_tick_image if split_data[2][0] == "R" else red_tick_image, (670, 460))  
+        #screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500))
         
-        start_game = all(sublist[0] == "R" for sublist in split_data)
+        #if all(sublist[0] == "R" for sublist in split_data) and len(split_data):
+        if all(sublist[0] == "R" for sublist in split_data): #set start_game flag
+            start_game = True
         
         print(start_game)
         
         #print(all(sublist[0] == "R" for sublist in split_data))
         
-        
+
         client_socket.close()
        
     except Exception as e:
-        print("Connection error:", e)
+        print("get_players_status error:", e)
     
 def set_ready(ip, port):
     try:
@@ -141,12 +143,9 @@ def connect_to_server(ip, port):
         
         # Send player information to the server
         text = "CONNECTION\n"
-        #text = "RESET\n"
         client_socket.sendall(text.encode())
-        
-        
-        
         data = client_socket.recv(1024)
+        
         print(data.decode())
         
         string_data = data.decode()
@@ -202,7 +201,7 @@ def reset_server(ip, port):
         print("Connection error:", e)
 
 def main():
-    global id, posX, posY
+    global id, posX, posY, start_game
     
     # Initialize variables
     state = "start"
@@ -347,7 +346,10 @@ def main():
 
             get_players_status(ip_text, int(port_text))
             
-        #elif start_game == True:
+            if (start_game == True):
+                state = "start_game"
+            
+        elif state == "start_game":
             arguments = [ str(id) , str(posX) , str(posY) ]
             
             subprocess.Popen(["python", "game.py"] + arguments)

@@ -84,6 +84,11 @@ public class Server extends Thread {
 				gameManager.savePlayerPosition(playerId, posX, posY);
 				return "Successully saved the position";
 			}
+			
+			if (clientInput.contains("DIE")) {
+				System.out.println(clientInput);
+				return "clientInput";
+			}
 			throw new Exception("Invalid client input...");
 		} catch (Exception e) {
 			return "ERROR:" + e.toString();

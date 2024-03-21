@@ -2,12 +2,20 @@ from pygame.math import Vector2
 import pygame
 
 class PLAYER:
-    def __init__(self,id,posX,posY):
+    def __init__(self,_id,_posX,_posY):
         #self.bodys = [Vector2(19,38),Vector2(19,39)]
-        self.id = id
-        self.pos = Vector2(posX,posY)
-        self.direction = Vector2(0,-1)
+        self.id = _id
+        self.pos = Vector2(_posX,_posY)
+        self.alive = True
         
+        if (self.id == 0):
+            self.direction = Vector2(1,0)
+        elif (self.id == 1):
+            self.direction = Vector2(0,-1)
+        elif (self.id == 2):
+            self.direction = Vector2(0,1)
+        elif (self.id == 3):
+            self.direction = Vector2(-1,0)    
         #self.pos = Vector2(-1,-1)
         #self.direction = Vector2(0,0)
 
