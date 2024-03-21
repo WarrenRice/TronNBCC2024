@@ -24,15 +24,18 @@ class MAIN:
             try:
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
-    
-                message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + "\n"
+                message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + PROPERTY_DELIMETER + str(int(self.player.pos.x)) + PROPERTY_DELIMETER + str(int(self.player.pos.y)) + "\n"
+                client_socket.sendall(message.encode())
+                client_socket.recv(1024)
+                client_socket.close()
+                
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+                message = "GET_POSITIONS\n"
                 client_socket.sendall(message.encode())
                 data = client_socket.recv(1024)
-                
-                print(data.decode())
-            
                 client_socket.close()
-            
+                print(data.decode())
             except Exception as e:
                 print("Connection error:", e)
     

@@ -2,7 +2,6 @@ import socket
 import sys
 import pygame
 import subprocess
-from first.player import PLAYER
 from first.gameColor import COLOR
 
 # Initialize Pygame
