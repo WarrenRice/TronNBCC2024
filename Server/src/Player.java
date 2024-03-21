@@ -14,6 +14,7 @@ public class Player {
 		this.posX = posX;
 		this.posY = posY;
 		this.ready = false;
+		this.alive = true;
 	}
 	
 	public int getPlayerId() {
@@ -47,6 +48,14 @@ public class Player {
 	
 	public void setReady(boolean ready) {
 		this.ready = ready;
+	}
+	
+	public boolean getAlive() {
+		return this.alive;
+	}
+	
+	public void setAlive(boolean alive) {
+		this.alive = alive;
 	}
 	
 	public String getPosition() {

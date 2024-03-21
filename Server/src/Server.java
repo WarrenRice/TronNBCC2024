@@ -86,8 +86,10 @@ public class Server extends Thread {
 			}
 			
 			if (clientInput.contains("DIE")) {
-				System.out.println(clientInput);
-				return "clientInput";
+				String[] splitInput = clientInput.split(PROPERTY_DELIMETER);
+				int playerId = Integer.parseInt(splitInput[1]);
+				gameManager.setPlayerDead(playerId);
+				return "Successfully saved player " + playerId + "to dead";
 			}
 			throw new Exception("Invalid client input...");
 		} catch (Exception e) {

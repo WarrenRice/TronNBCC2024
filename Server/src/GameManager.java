@@ -46,7 +46,8 @@ public class GameManager {
 	public String getAllPlayerPositions() {
 		String positions = "";
 		for (Player p : playerList) {
-			positions += p.getPosition() + PROPERTY_DELIMETER;
+			String alive = p.getAlive() ? "A" : "D";
+			positions += alive + "," + p.getPosition() + PROPERTY_DELIMETER;
 		}
 		return positions;
 	}
@@ -69,5 +70,9 @@ public class GameManager {
 	
 	public void setPlayerReady(int playerId) {
 		playerList.get(playerId).setReady(true);
+	}
+	
+	public void setPlayerDead(int playerId) {
+		playerList.get(playerId).setAlive(false);
 	}
 }
