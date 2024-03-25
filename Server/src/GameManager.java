@@ -47,15 +47,14 @@ public class GameManager {
 		String positions = "";
 		for (Player p : playerList) {
 			String alive = p.getAlive() ? "A" : "D";
-			positions += alive + "," + p.getPosition() + PROPERTY_DELIMETER;
+			positions += alive + "," + p.getPosition() + "," + p.getLastPositions(4) + PROPERTY_DELIMETER;
 		}
 		return positions;
 	}
 	
 	public void savePlayerPosition(int playerId, int posX, int posY) {
 		Player player = playerList.get(playerId);
-		player.setPosX(posX);
-		player.setPosY(posY);
+		player.setPosition(posX, posY);
 	}
 	
 	// function for obtaining lobby status of players
@@ -74,5 +73,26 @@ public class GameManager {
 	
 	public void setPlayerDead(int playerId) {
 		playerList.get(playerId).setAlive(false);
+	}
+	
+	public static void main(String[] args) throws Exception {
+		GameManager gm = new GameManager();
+		gm.addNewPlayer();
+		for (int i = 0; i <= 10; i++) {
+			gm.savePlayerPosition(0, i, i);
+		}
+		gm.addNewPlayer();
+		for (int i = 0; i <= 10; i++) {
+			gm.savePlayerPosition(1, i, i);
+		}
+		gm.addNewPlayer();
+		for (int i = 0; i <= 10; i++) {
+			gm.savePlayerPosition(2, i, i);
+		}
+		gm.addNewPlayer();
+		for (int i = 0; i <= 10; i++) {
+			gm.savePlayerPosition(3, i, i);
+		}
+		System.out.println(gm.getAllPlayerPositions());
 	}
 }

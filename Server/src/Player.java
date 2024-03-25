@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 
 public class Player {
 	private int playerId;
@@ -7,6 +9,8 @@ public class Player {
 	private boolean ready;
 	private boolean alive;
 	public static final String PROPERTY_DELIMETER = "▐";
+	private List<Integer> previousPosX;
+	private List<Integer> previousPosY;
 	
 	public Player(int playerId, int color, int posX, int posY) {
 		this.playerId = playerId;
@@ -15,6 +19,8 @@ public class Player {
 		this.posY = posY;
 		this.ready = false;
 		this.alive = true;
+		this.previousPosX = new ArrayList<>();
+		this.previousPosY = new ArrayList<>();
 	}
 	
 	public int getPlayerId() {
@@ -32,14 +38,9 @@ public class Player {
 	public int getPosX() {
 		return posX;
 	}
-	public void setPosX(int posX) {
-		this.posX = posX;
-	}
+	
 	public int getPosY() {
 		return posY;
-	}
-	public void setPosY(int posY) {
-		this.posY = posY;
 	}
 	
 	public boolean getReady() {
@@ -63,6 +64,17 @@ public class Player {
 				posY;
 	}
 	
+	public String getLastPositions(int numPositions) {
+		String positions = "";
+		int lastIndex = previousPosX.size() - 1;
+		for (int i = 0; i < numPositions; i++) {
+			int currIndex = lastIndex - i;
+			if (currIndex < 0) break;
+			positions += previousPosX.get(currIndex) + "," + previousPosY.get(currIndex) + ",";
+		}
+		return positions;
+	}
+	
 	public String toString() {
 		return playerId + PROPERTY_DELIMETER + 
 				getPosition();
@@ -71,6 +83,13 @@ public class Player {
 	public String getLobbyStatus() {
 		String status = ready ? "R" : "N";
 		return status + "," + getPosition();
+	}
+	
+	public void setPosition(int posX, int posY) {
+		previousPosX.add(this.posX);
+		previousPosY.add(this.posY);
+		this.posX = posX;
+		this.posY = posY;
 	}
 	
 }
