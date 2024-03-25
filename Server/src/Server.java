@@ -89,7 +89,7 @@ public class Server extends Thread {
 				String[] splitInput = clientInput.split(PROPERTY_DELIMETER);
 				int playerId = Integer.parseInt(splitInput[1]);
 				gameManager.setPlayerDead(playerId);
-				return "Successfully saved player " + playerId + "to dead";
+				return "Successfully saved player " + playerId + " to dead";
 			}
 			throw new Exception("Invalid client input...");
 		} catch (Exception e) {

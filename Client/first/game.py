@@ -3,13 +3,14 @@ from pygame.math import Vector2
 from first.player import PLAYER
 from first.map import MAP
 
+
 PROPERTY_DELIMETER = "▐";
 
 # Access arguments
 arguments = sys.argv[1:]  # Exclude the first argument, which is the script filename
 
 # Use arguments as needed
-print("Arguments:", arguments)
+#print("Arguments:", arguments)
 
 
 class MAIN:
@@ -20,7 +21,7 @@ class MAIN:
     def update(self):
         if self.player.alive:
             self.player.move() #update position
-    
+            
             try:
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
@@ -35,20 +36,34 @@ class MAIN:
                 client_socket.sendall(message.encode())
                 data = client_socket.recv(1024)
                 client_socket.close()
-                print(data.decode())
+
+                data_string = data.decode()
+                
+                # Remove the last character from the input string
+                data_string = data_string[:-3]
+
+                data_array = data_string.split("▐")
+                
+                print("data in: " + str(data_string))
+                print("data in: " + str(len(data_array)))
+                
+                
+                
+                
             except Exception as e:
                 print("Connection error:", e)
     
             try:
                 self.checkCollision()
-                if (self.player.pos.x < self.map.size and self.player.pos.y < self.map.size):
-                    self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
+                if (self.player.pos.x >= 0 and self.player.pos.x < self.map.size and self.player.pos.y >= 0 and self.player.pos.y < self.map.size):
+                    self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),(self.player.id+1))
+                    
             except Exception as e:
                 print("Main update error:", e)
     
             
     
-    
+            '''
             self.map.setValue(19,0,2)
             self.map.setValue(19,1,2)
             self.map.setValue(19,2,2)
@@ -91,9 +106,10 @@ class MAIN:
             self.map.setValue(8,17,4)
             self.map.setValue(8,16,4)
             self.map.setValue(9,16,4)
-    
+            '''
             
-    
+        else:
+            pass
             #self.map.printMap()
 
     def draw(self):
@@ -101,15 +117,21 @@ class MAIN:
         self.map.drawMap(screen,cellSize)
 
     def checkCollision(self):
+
         try:
-            if not (0 <= self.player.pos.x <= cellNumber) or not (0 <= self.player.pos.y <= cellNumber) :
+            if self.player.pos.x < 0 or self.player.pos.x > cellNumber-1 or self.player.pos.y < 0 or self.player.pos.y > cellNumber-1:
+                #if (self.player.alive):
                 self.player.alive = False
-                #self.gameOver()
                 self.set_dead()
+            
+            
+            
+            #if not (0 <= self.player.pos.x <= cellNumber) or not (0 <= self.player.pos.y <= cellNumber) :
+                
             else:
                 if not self.map.getValue(int(self.player.pos.x),int(self.player.pos.y)) == 0:
+                    #if (self.player.alive):
                     self.player.alive = False
-                    #self.gameOver()
                     self.set_dead()
                     
             '''
@@ -135,14 +157,7 @@ class MAIN:
             client_socket.close()
         
         except Exception as e:
-            print("Connection error:", e)
-
-        try:
-            self.checkCollision()
-            if (self.player.pos.x < self.map.size and self.player.pos.y < self.map.size):
-                self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),1)
-        except Exception as e:
-            print("Main update error:", e)        
+            print("Connection error:", e)     
     
     def gameOver(self):
         pygame.quit()
@@ -165,6 +180,7 @@ SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,150)
 
 mainGame = MAIN(cellNumber)
+
 
 while True:
     #draw all elements

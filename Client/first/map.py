@@ -44,10 +44,10 @@ class MAP:
                     yPos = int(row*cellSize)
                     bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
 
-                    pygame.draw.rect(screen,(0,0,255), bodyRect)
+                    pygame.draw.rect(screen,(75,75,255), bodyRect)
                 elif self.map[col][row] == 4:
                     xPos = int(col*cellSize)
                     yPos = int(row*cellSize)
                     bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
 
-                    pygame.draw.rect(screen,(0,255,255), bodyRect)
+                    pygame.draw.rect(screen,(255,255,0), bodyRect)
