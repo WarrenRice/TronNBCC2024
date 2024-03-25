@@ -46,7 +46,28 @@ class MAIN:
                 data_array = data_string.split("▐")
                 
                 print("data in: " + str(data_string))
-                print("data in: " + str(len(data_array)))
+                
+                #print(len(data_array))
+                #print(type(len(data_array)))
+                
+                others_players = []
+                
+                for sub_array in data_array:
+                    # Split the subarray by "," character
+                    elements = sub_array.split(",")
+                    # Convert the numeric elements to integers
+                    elements[1:] = [int(x) for x in elements[1:]]
+                    # Append the modified subarray to the result list
+                    others_players.append(elements)
+                
+                print(others_players)
+                
+                for _ in range(len(others_players)):
+                    #print("test")
+                    if not _ == self.player.id:
+                        
+                        print(others_players[_])
+                        self.map.setValue(others_players[_][1],others_players[_][2],_+1)
 
             except Exception as e:
                 print("Connection error:", e)
@@ -158,6 +179,6 @@ while True:
                     mainGame.player.direction = Vector2(1,0)
 
     screen.fill((25,25,25))
-    pygame.display.update()
     mainGame.draw()
+    pygame.display.update()
     clock.tick(60) #60 frame/second
