@@ -10,8 +10,8 @@ PROPERTY_DELIMETER = "▐";
 arguments = sys.argv[1:]  # Exclude the first argument, which is the script filename
 
 # Use arguments as needed
-#print("Arguments:", arguments)
-
+# print("Arguments:", arguments)
+print(arguments)
 
 class MAIN:
     def __init__(self, size):
@@ -22,6 +22,7 @@ class MAIN:
         if self.player.alive:
             self.player.move() #update position
             
+
             try:
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
@@ -46,10 +47,7 @@ class MAIN:
                 
                 print("data in: " + str(data_string))
                 print("data in: " + str(len(data_array)))
-                
-                
-                
-                
+
             except Exception as e:
                 print("Connection error:", e)
     
@@ -60,54 +58,7 @@ class MAIN:
                     
             except Exception as e:
                 print("Main update error:", e)
-    
-            
-    
-            '''
-            self.map.setValue(19,0,2)
-            self.map.setValue(19,1,2)
-            self.map.setValue(19,2,2)
-            self.map.setValue(19,3,2)
-            self.map.setValue(20,3,2)
-            self.map.setValue(21,3,2)
-            self.map.setValue(22,3,2)
-            self.map.setValue(22,4,2)
-            self.map.setValue(22,5,2)
-            self.map.setValue(22,6,2)
-            self.map.setValue(22,7,2)
-            self.map.setValue(23,7,2)
-            self.map.setValue(24,7,2)
-    
-    
-            self.map.setValue(39,19,3)
-            self.map.setValue(38,19,3)
-            self.map.setValue(37,19,3)
-            self.map.setValue(36,19,3)
-            self.map.setValue(35,19,3)
-            self.map.setValue(35,20,3)
-            self.map.setValue(35,21,3)
-            self.map.setValue(35,22,3)
-            self.map.setValue(35,23,3)
-            self.map.setValue(35,24,3)
-            self.map.setValue(35,25,3)
-            self.map.setValue(35,26,3)
-    
-    
-            self.map.setValue(0,19,4)
-            self.map.setValue(1,19,4)
-            self.map.setValue(2,19,4)
-            self.map.setValue(3,19,4)
-            self.map.setValue(4,19,4)
-            self.map.setValue(5,19,4)
-            self.map.setValue(6,19,4)
-            self.map.setValue(7,19,4)
-            self.map.setValue(8,19,4)
-            self.map.setValue(8,18,4)
-            self.map.setValue(8,17,4)
-            self.map.setValue(8,16,4)
-            self.map.setValue(9,16,4)
-            '''
-            
+
         else:
             pass
             #self.map.printMap()
@@ -171,8 +122,8 @@ screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber))
 clock = pygame.time.Clock()
 
 # Set up networking
-SERVER_ADDRESS = '127.0.0.1'  # Change this to your server's IP address
-SERVER_PORT = 6066
+SERVER_ADDRESS = arguments[3]  # Change this to your server's IP address
+SERVER_PORT = int(arguments[4])
 
 
 
@@ -207,6 +158,6 @@ while True:
                     mainGame.player.direction = Vector2(1,0)
 
     screen.fill((25,25,25))
-    mainGame.draw()
     pygame.display.update()
+    mainGame.draw()
     clock.tick(60) #60 frame/second
