@@ -1,9 +1,11 @@
 import pygame
+from first.gameColor import COLOR
 
 class MAP:
     def __init__(self, size):
         self.size = size
         self.map = [[0] * size for _ in range(size)]
+        self.use_color = use_color = COLOR()
 
     def setValue(self, x, y, value):
         if 0 <= x < self.size and 0 <= y < self.size:
@@ -27,6 +29,14 @@ class MAP:
     def drawMap(self, screen, cellSize):
         for row in range(self.size):
             for col in range(self.size):
+
+
+                xPos = int(col*cellSize)
+                yPos = int(row*cellSize)
+                bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
+                pygame.draw.rect(screen, self.use_color[self.map[col][row]], bodyRect)
+
+                '''
                 if self.map[col][row] == 1:
                     xPos = int(col*cellSize)
                     yPos = int(row*cellSize)
@@ -51,3 +61,4 @@ class MAP:
                     bodyRect = pygame.Rect(xPos,yPos,cellSize,cellSize)
 
                     pygame.draw.rect(screen,(255,255,0), bodyRect)
+                '''

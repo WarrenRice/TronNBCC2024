@@ -1,4 +1,4 @@
-import pygame, sys, random, socket
+import pygame, sys, socket
 from pygame.math import Vector2
 from first.player import PLAYER
 from first.map import MAP
@@ -19,9 +19,9 @@ class MAIN:
         self.map = MAP(size)
         
     def update(self):
+
         if self.player.alive:
             self.player.move() #update position
-            
 
             try:
                 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,47 +30,10 @@ class MAIN:
                 client_socket.sendall(message.encode())
                 client_socket.recv(1024)
                 client_socket.close()
-                
-                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
-                message = "GET_POSITIONS\n"
-                client_socket.sendall(message.encode())
-                data = client_socket.recv(1024)
-                client_socket.close()
-
-                data_string = data.decode()
-                
-                # Remove the last character from the input string
-                data_string = data_string[:-3]
-
-                data_array = data_string.split("▐")
-                
-                print("data in: " + str(data_string))
-                
-                #print(len(data_array))
-                #print(type(len(data_array)))
-                
-                others_players = []
-                
-                for sub_array in data_array:
-                    # Split the subarray by "," character
-                    elements = sub_array.split(",")
-                    # Convert the numeric elements to integers
-                    elements[1:] = [int(x) for x in elements[1:]]
-                    # Append the modified subarray to the result list
-                    others_players.append(elements)
-                
-                print(others_players)
-                
-                for _ in range(len(others_players)):
-                    #print("test")
-                    if not _ == self.player.id:
-                        
-                        print(others_players[_])
-                        self.map.setValue(others_players[_][1],others_players[_][2],_+1)
-
             except Exception as e:
-                print("Connection error:", e)
+                print("Save Position error", e)
+                
+            self.get_positions()
     
             try:
                 self.checkCollision()
@@ -81,9 +44,18 @@ class MAIN:
                 print("Main update error:", e)
 
         else:
-            pass
-            #self.map.printMap()
+            
+            if self.player.remove == False:
+                
+                for _row in range(cellNumber):
+                    for _col in range(cellNumber):
+                        if self.map.getValue(_col, _row) == (self.player.id+1) :
+                            self.map.setValue(_col,_row,0)
+                    
+                    self.get_positions()        
 
+            self.player.remove = True
+  
     def draw(self):
         self.player.draw(screen,cellSize)
         self.map.drawMap(screen,cellSize)
@@ -131,6 +103,60 @@ class MAIN:
         except Exception as e:
             print("Connection error:", e)     
     
+    def get_positions(self):
+        try:
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+            message = "GET_POSITIONS\n"
+            client_socket.sendall(message.encode())
+            data = client_socket.recv(1024)
+            client_socket.close()
+
+            data_string = data.decode()
+            
+            # Remove the last character from the input string
+            data_string = data_string[:-3]
+            #print("data in: " + str(data_string))
+            
+            data_array = data_string.split("▐")
+
+            players = []
+            
+            
+            #print("--------------------")
+            for sub_array in data_array:
+                sub_array = sub_array[:-1]
+                #print(sub_array)
+                # Split the subarray by "," character
+                elements = sub_array.split(",")
+                
+                # Convert the numeric elements to integers
+                elements[1:] = [int(x) for x in elements[1:]]
+                #print(elements)
+                # Append the modified subarray to the result list
+                players.append(elements)
+            
+            #print(others_players)
+            count = 0
+            for _index in range(len(players)):
+                #print("test")
+
+                if not (_index == self.player.id):
+                    #print("players[_index]")
+                    #print(players[_index])
+                    #print(int(len(players[_index])-1)/2)
+                    if (players[_index][0] == 'A'):
+                        back_tail = int((len(players[_index])-1)/2)
+                        for _tIndex in range(back_tail):
+                            self.map.setValue(players[_index][_tIndex*2+1],players[_index][_tIndex*2+2],_index+1)
+                    else:
+                        count += 1
+            if (count > len(players)-2):
+                self.player.you_win = True
+            
+                        
+        except Exception as e:
+            print("Connection error update:", e)
     def gameOver(self):
         pygame.quit()
         sys.exit()
@@ -139,20 +165,26 @@ class MAIN:
 pygame.init()
 cellSize = 16
 cellNumber = 40 
-screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber))
+screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber + 50))
 clock = pygame.time.Clock()
 
 # Set up networking
 SERVER_ADDRESS = arguments[3]  # Change this to your server's IP address
 SERVER_PORT = int(arguments[4])
 
-
+# Font
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+font = pygame.font.Font(None, 36)
 
 SCREEN_UPDATE = pygame.USEREVENT
-pygame.time.set_timer(SCREEN_UPDATE,150)
+pygame.time.set_timer(SCREEN_UPDATE,300)
 
 mainGame = MAIN(cellNumber)
 
+def draw_text(ip_text, ip_color, x, y):
+    ip_text_surface = font.render(ip_text, True, ip_color)
+    screen.blit(ip_text_surface, (x, y))
 
 while True:
     #draw all elements
@@ -180,5 +212,17 @@ while True:
 
     screen.fill((25,25,25))
     mainGame.draw()
+    
+    # Check if player is alive
+    if not mainGame.player.alive:
+        draw_text("You Lose", WHITE, 200, 200)  # Display "You Lose" text
+    elif mainGame.player.you_win:
+        draw_text("You Won", WHITE, 200, 200)
+       
+    hud = pygame.Rect(0,cellSize *cellNumber,cellSize *cellNumber,cellSize *cellNumber+50)
+    pygame.draw.rect(screen, (125,125,125), hud)   
+    draw_text("you are " + str(mainGame.player.id), mainGame.map.use_color[mainGame.player.id+1], 200, cellSize *cellNumber+20)
+    
+    
     pygame.display.update()
     clock.tick(60) #60 frame/second

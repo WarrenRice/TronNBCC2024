@@ -75,7 +75,7 @@ def get_players_status(ip, port):
         draw_text("STATUS ", WHITE, 640, 340)
         
         for _ in range(len(split_data)):
-            draw_text("you" if id == _ else ("Player" + str(_+1)), use_color[_], 500, 380+_*40)
+            draw_text("you" if id == _ else ("Player" + str(_+1)), use_color[_+1], 500, 380+_*40)
             screen.blit(green_tick_image if split_data[_][0] == "R" else red_tick_image, (670, 380+_*40))
         
         #draw_text("you" if id == 0 else "Player 1", use_color[0], 500, 380)
@@ -214,8 +214,8 @@ def main():
     ip_color_active = pygame.Color('yellow')
     ip_color = ip_color_inactive
     ip_active = False
-    ip_text = '25.42.224.13'
-    #ip_text = 'localhost'
+    #ip_text = '25.42.224.13'
+    ip_text = 'localhost'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')

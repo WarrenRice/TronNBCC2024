@@ -7,6 +7,8 @@ class PLAYER:
         self.id = _id
         self.pos = Vector2(_posX,_posY)
         self.alive = True
+        self.remove = False
+        self.you_win = False
         
         if (self.id == 0):
             self.direction = Vector2(1,0)
