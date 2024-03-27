@@ -11,7 +11,7 @@ arguments = sys.argv[1:]  # Exclude the first argument, which is the script file
 
 # Use arguments as needed
 # print("Arguments:", arguments)
-print(arguments)
+# print(arguments)
 
 class MAIN:
     def __init__(self, size):
@@ -47,15 +47,18 @@ class MAIN:
             
             if self.player.remove == False:
                 
-                for _row in range(cellNumber):
-                    for _col in range(cellNumber):
-                        if self.map.getValue(_col, _row) == (self.player.id+1) :
-                            self.map.setValue(_col,_row,0)
-                    
-                    self.get_positions()        
+                self.remove_by_id(self.player.id)
+                   
+                self.get_positions()        
 
             self.player.remove = True
-  
+            
+    def remove_by_id(self, _id):
+        for _row in range(cellNumber):
+            for _col in range(cellNumber):
+                if self.map.getValue(_col, _row) == (_id+1) :
+                    self.map.setValue(_col,_row,0)
+
     def draw(self):
         self.player.draw(screen,cellSize)
         self.map.drawMap(screen,cellSize)
@@ -138,20 +141,23 @@ class MAIN:
             
             #print(others_players)
             count = 0
-            for _index in range(len(players)):
+            for _id in range(len(players)):
                 #print("test")
 
-                if not (_index == self.player.id):
+                if not (_id == self.player.id) and not (_id in dead_list):
                     #print("players[_index]")
-                    #print(players[_index])
+                    #print(players[_id])
                     #print(int(len(players[_index])-1)/2)
-                    if (players[_index][0] == 'A'):
-                        back_tail = int((len(players[_index])-1)/2)
+                    if (players[_id][0] == 'A'):
+                        back_tail = int((len(players[_id])-1)/2)
                         for _tIndex in range(back_tail):
-                            self.map.setValue(players[_index][_tIndex*2+1],players[_index][_tIndex*2+2],_index+1)
+                            self.map.setValue(players[_id][_tIndex*2+1],players[_id][_tIndex*2+2],_id+1)
                     else:
-                        count += 1
-            if (count > len(players)-2):
+                        dead_list.append(_id)
+                        self.remove_by_id(_id)
+
+
+            if (len(dead_list) > len(players)-2):
                 self.player.you_win = True
             
                         
@@ -179,6 +185,8 @@ font = pygame.font.Font(None, 36)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,300)
+
+dead_list = []
 
 mainGame = MAIN(cellNumber)
 

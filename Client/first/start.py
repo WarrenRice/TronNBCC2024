@@ -50,14 +50,14 @@ def get_players_status(ip, port):
         # Connect to the server
         client_socket.connect((ip, port))
         
-        print("Connected to the server and getting players")
+        #print("Connected to the server and getting players")
         
         # Send player information to the server
         text = "GET_PLAYERS\n"
         client_socket.sendall(text.encode())
         
         data = client_socket.recv(1024)
-        print(data.decode())
+        #print(data.decode())
         
         string_data = data.decode()
 
@@ -92,7 +92,7 @@ def get_players_status(ip, port):
         if all(sublist[0] == "R" for sublist in split_data): #set start_game flag
             start_game = True
         
-        print(start_game)
+        #print(start_game)
         
         #print(all(sublist[0] == "R" for sublist in split_data))
         
@@ -111,15 +111,15 @@ def set_ready(ip, port):
         # Connect to the server
         client_socket.connect((ip, port))
         
-        print("Connected to the server and setting players")
+        #print("Connected to the server and setting players")
         
         # Send player information to the server
         text = "READY" + PROPERTY_DELIMETER + str(id) + "\n"
-        print(text)
+        #print(text)
         client_socket.sendall(text.encode())
         
         data = client_socket.recv(1024)
-        print(data.decode())
+        #print(data.decode())
         
         client_socket.close()
         return True
@@ -145,7 +145,7 @@ def connect_to_server(ip, port):
         client_socket.sendall(text.encode())
         data = client_socket.recv(1024)
         
-        print(data.decode())
+        #print(data.decode())
         
         string_data = data.decode()
 
@@ -163,9 +163,9 @@ def connect_to_server(ip, port):
         posX = int(pos_text[:comma_index])
         posY = int(pos_text[comma_index + 1:])
         
-        print("id:", id)
-        print("posX:", posX)
-        print("posY:", posY)
+        #print("id:", id)
+        #print("posX:", posX)
+        #print("posY:", posY)
                 
 
         client_socket.close()
@@ -184,7 +184,7 @@ def reset_server(ip, port):
         # Connect to the server
         client_socket.connect((ip, port))
         
-        print("Connected to the server successfully!")
+        #print("Connected to the server successfully!")
         
         # Send player information to the server
         text = "RESET\n"
@@ -192,7 +192,7 @@ def reset_server(ip, port):
         client_socket.sendall(text.encode())
 
         data = client_socket.recv(1024)
-        print(data.decode())
+        #print(data.decode())
 
         client_socket.close()
         
@@ -215,7 +215,8 @@ def main():
     ip_color = ip_color_inactive
     ip_active = False
     #ip_text = '25.42.224.13'
-    ip_text = 'localhost'
+    ip_text = '25.34.232.141'
+    #ip_text = 'localhost'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
