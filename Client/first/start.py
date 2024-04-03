@@ -198,6 +198,37 @@ def reset_server(ip, port):
         
     except Exception as e:
         print("Connection error:", e)
+        
+def disconnect_server(ip, port):
+    try:
+
+        # Create a socket object
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        
+        # Connect to the server
+        client_socket.connect((ip, port))
+        
+        #print("Connected to the server and setting players")
+        
+        # Send player information to the server
+        text = "DISCONNECTED" + PROPERTY_DELIMETER + str(id) + "\n"
+        print(text)
+        client_socket.sendall(text.encode())
+        
+        data = client_socket.recv(1024)
+        #print(data.decode())
+        
+        client_socket.close()
+        
+    except Exception as e:
+        print("disconnect_server error:", e)
+
+def draw_rounded_rect(surface, color, rect, radius=10):
+    pygame.draw.rect(surface, color, rect, border_radius=radius)
+
+def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, radius=10):
+    draw_rounded_rect(screen, color, rect, radius)
+    draw_text(text, text_color, rect.x + offsetX, rect.y + 12)
 
 def main():
     global id, posX, posY, start_game
@@ -230,6 +261,7 @@ def main():
     connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
     connect_button_text = "Connect"
     connect_button_text_color = WHITE
+    connect_button_text_offsetX = 50
     
     # Ready button
     ready_button_rect = pygame.Rect(750, 700, 200, 50)
@@ -265,15 +297,20 @@ def main():
         screen.blit(txt_surface, (port_input_box.x+5, port_input_box.y+5))
         pygame.draw.rect(screen, port_color, port_input_box, 2)
 
-        # Draw Connect Button5
-        pygame.draw.rect(screen, connect_button_color, connect_button_rect)
-        draw_text(connect_button_text, connect_button_text_color, 100, 460)
+        # Draw Buttons
+        #pygame.draw.rect(screen, connect_button_color, connect_button_rect)
+        #draw_text(connect_button_text, connect_button_text_color, 100, 460)
+        draw_button_with_rounded_corners(connect_button_text, connect_button_rect, connect_button_color, connect_button_text_color, connect_button_text_offsetX, radius=10)
+
         
-        pygame.draw.rect(screen, reset_button_color, reset_button_rect)
-        draw_text(reset_button_text, reset_button_text_color, 100, 710)
+        #pygame.draw.rect(screen, reset_button_color, reset_button_rect)
+        #draw_text(reset_button_text, reset_button_text_color, 100, 710)
+        draw_button_with_rounded_corners(reset_button_text, reset_button_rect, reset_button_color, reset_button_text_color, 65, radius=10)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                if not id == -1 :
+                    disconnect_server(ip_text, int(port_text))
                 pygame.quit()
                 sys.exit()
                 
@@ -296,6 +333,7 @@ def main():
                             connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
                             connect_button_text = "Connected"
                             connect_button_text_color = BLACK
+                            connect_button_text_offsetX = 40
 
                         
                 elif ready_button_rect.collidepoint(event.pos):
@@ -331,8 +369,9 @@ def main():
 
         if state == "connected":
             # Draw Ready Button
-            pygame.draw.rect(screen, ready_button_color, ready_button_rect)
-            draw_text(ready_button_text, ready_button_text_color, 800, 710)
+            draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
+            #pygame.draw.rect(screen, ready_button_color, ready_button_rect)
+            #draw_text(ready_button_text, ready_button_text_color, 800, 710)
             
             get_players_status(ip_text, int(port_text))
             
@@ -341,8 +380,9 @@ def main():
             
         elif state == "ready":
             # Draw Ready Button
-            pygame.draw.rect(screen, ready_button_color, ready_button_rect)
-            draw_text(ready_button_text, ready_button_text_color, 800, 710)
+            draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
+            #pygame.draw.rect(screen, ready_button_color, ready_button_rect)
+            #draw_text(ready_button_text, ready_button_text_color, 800, 710)
 
             get_players_status(ip_text, int(port_text))
             

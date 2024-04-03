@@ -31,13 +31,13 @@ public class GameManager {
 	public int[] getInitialPosition(int playerId) throws Exception {
 		switch(playerId) {
 		case 0:
-			return new int[] {0, 0};
+			return new int[] {0, 49};
 		case 1:
-			return new int[] {0, 39};
+			return new int[] {49, 99};
 		case 2:
-			return new int[] {39, 0};
+			return new int[] {49, 0};
 		case 3:
-			return new int[] {39, 39};
+			return new int[] {99, 49};
 		default:
 			throw new Exception("Invalid player id.");
 		}

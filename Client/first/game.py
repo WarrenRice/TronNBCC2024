@@ -163,14 +163,15 @@ class MAIN:
                         
         except Exception as e:
             print("Connection error update:", e)
+            
     def gameOver(self):
         pygame.quit()
         sys.exit()
         
 
 pygame.init()
-cellSize = 16
-cellNumber = 40 
+cellSize = 8#16
+cellNumber = 100#40 
 screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber + 50))
 clock = pygame.time.Clock()
 
@@ -198,6 +199,10 @@ while True:
     #draw all elements
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            mainGame.player.alive = False
+            mainGame.set_dead()
+            #print(mainGame.player.alive)
+            #mainGame.printStm()
             pygame.quit()
             sys.exit()
 

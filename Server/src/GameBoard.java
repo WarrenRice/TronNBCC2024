@@ -8,7 +8,7 @@ public class GameBoard {
 	private int[][] arena;
 	
 	public GameBoard() {
-		arena = new int[40][40];
+		arena = new int[100][100];
 	}
 	
 	public GameBoard(int size) {
