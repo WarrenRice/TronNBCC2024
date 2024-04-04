@@ -2,13 +2,14 @@ from pygame.math import Vector2
 import pygame
 
 class PLAYER:
-    def __init__(self, _id, _posX, _posY):
+    def __init__(self, _id, _posX, _posY, _name):
         # Initialize the player with an ID, position, and alive status
         self.id = _id  # Unique identifier for the player
         self.pos = Vector2(_posX, _posY)  # Current position of the player
         self.alive = True  # Status to track if the player is alive
         self.remove = False  # Flag to check if the player needs to be removed
         self.you_win = False  # Status to check if the player has won
+        self.name = _name
         
         # Set the initial direction of movement based on the player's ID
         if self.id == 0:

@@ -4,6 +4,8 @@ import pygame
 import subprocess
 from first.gameColor import COLOR
 
+#ADD NAME
+#AFTER CONNECTION BUG
 
 # Initialize Pygame
 pygame.init()
@@ -19,9 +21,9 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("- Tron Multiplayer Lobby -")
 
 # Load images
-background_image = pygame.image.load("Tron2.jpg").convert()  # Replace "Tron2.jpg" with your actual image file path
-green_tick_image = pygame.image.load("Green.png").convert_alpha()  # Replace "green_tick.png" with your green tick image file path
-red_tick_image = pygame.image.load("Red.png").convert_alpha()  # Replace "red_tick.png" with your red tick image file path
+background_image = pygame.image.load("Tron2.jpg").convert()  
+green_tick_image = pygame.image.load("Green.png").convert_alpha() 
+red_tick_image = pygame.image.load("Red.png").convert_alpha()  
 
 # Font
 font = pygame.font.Font(None, 36)
@@ -34,6 +36,7 @@ use_color = COLOR()
 id = -1
 posX = -1
 posY = -1
+name = ""
 
 def draw_text(ip_text, ip_color, x, y):
     ip_text_surface = font.render(ip_text, True, ip_color)
@@ -45,7 +48,6 @@ def get_players_status(ip, port):
     try:
 
         # Create a socket object
-
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         # Connect to the server
@@ -81,25 +83,10 @@ def get_players_status(ip, port):
             draw_text("you" if id == _ else ("Player" + str(_+1)), use_color[_+1], 500, 380+_*40)
             screen.blit(green_tick_image if split_data[_][0] == "R" else red_tick_image, (670, 380+_*40))
         
-        #draw_text("you" if id == 0 else "Player 1", use_color[0], 500, 380)
-        #draw_text("you" if id == 1 else "Player 2", use_color[1] if len(split_data) > 1 else BLACK, 500, 420)
-        #draw_text("you" if id == 2 else "Player 3", use_color[2] if len(split_data) > 2 else BLACK, 500, 460)
-        #draw_text("you" if id == 3 else "Player 4", use_color[3] if len(split_data) > 3 else BLACK, 500, 500)
 
-        #screen.blit(green_tick_image if split_data[0][0] == "R" else red_tick_image, (670, 380))  
-        #screen.blit(green_tick_image if split_data[1][0] == "R" else red_tick_image, (670, 420)) 
-        #screen.blit(green_tick_image if split_data[2][0] == "R" else red_tick_image, (670, 460))  
-        #screen.blit(green_tick_image if split_data[3][0] == "R" else red_tick_image, (670, 500))
-        
-        #if all(sublist[0] == "R" for sublist in split_data) and len(split_data):
         player_statuses = filter(lambda status: status[0] != "IGNORE", split_data)
         if all(sublist[0] == "R" for sublist in player_statuses) and all(sublist[0] != "NR" for sublist in player_statuses): #set start_game flag
             start_game = True
-        
-        #print(start_game)
-        
-        #print(all(sublist[0] == "R" for sublist in split_data))
-        
 
         client_socket.close()
        
@@ -132,20 +119,22 @@ def set_ready(ip, port):
         print("Connection error:", e)
         return None
 
-def connect_to_server(ip, port):
+def connect_to_server(ip, port, _name):
     global id, posX, posY
     try:
-
+        
         # Create a socket object
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         # Connect to the server
         client_socket.connect((ip, port))
         
-        print("Connected to the server successfully!")
+        #print("Connected to the server successfully!")
         
         # Send player information to the server
-        text = "CONNECTION\n"
+        text = "CONNECTION" + PROPERTY_DELIMETER + _name +"\n"
+        text = "CONNECTION" + "\n"
+        
         client_socket.sendall(text.encode())
         data = client_socket.recv(1024)
         
@@ -216,7 +205,7 @@ def disconnect_server(ip, port):
         
         # Send player information to the server
         text = "DISCONNECTED" + PROPERTY_DELIMETER + str(id) + "\n"
-        print(text)
+        #print(text)
         client_socket.sendall(text.encode())
         
         data = client_socket.recv(1024)
@@ -251,8 +240,8 @@ def main():
     ip_active = False
     #ip_text = '25.42.224.13'
     #ip_text = '25.41.59.168'
-    ip_text = 'localhost'
-    # ip_text = '25.34.232.141'
+    #ip_text = 'localhost'
+    ip_text = '25.34.232.141'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
@@ -261,8 +250,15 @@ def main():
     port_active = False
     port_text = '6066'
     
+    name_input_box = pygame.Rect(250, 445, 140, 36)
+    name_color_inactive = pygame.Color('gray')
+    name_color_active = pygame.Color('yellow')
+    name_color = port_color_inactive
+    name_active = False
+    name_text = name    
+    
     # Connect button
-    connect_button_rect = pygame.Rect(50, 450, 200, 50)
+    connect_button_rect = pygame.Rect(50, 500, 200, 50)
     connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
     connect_button_text = "Connect"
     connect_button_text_color = WHITE
@@ -301,16 +297,19 @@ def main():
         port_input_box.w = width
         screen.blit(txt_surface, (port_input_box.x+5, port_input_box.y+5))
         pygame.draw.rect(screen, port_color, port_input_box, 2)
+        
+        draw_text("Enter Name:", WHITE, 50, 450)
+        txt_surface = font.render(name_text, True, WHITE)
+        width = max(200, txt_surface.get_width()+10)
+        name_input_box.w = width
+        screen.blit(txt_surface, (name_input_box.x+5, name_input_box.y+5))
+        pygame.draw.rect(screen, name_color, name_input_box, 2)
 
         # Draw Buttons
-        #pygame.draw.rect(screen, connect_button_color, connect_button_rect)
-        #draw_text(connect_button_text, connect_button_text_color, 100, 460)
         draw_button_with_rounded_corners(connect_button_text, connect_button_rect, connect_button_color, connect_button_text_color, connect_button_text_offsetX, radius=10)
 
-        
-        #pygame.draw.rect(screen, reset_button_color, reset_button_rect)
-        #draw_text(reset_button_text, reset_button_text_color, 100, 710)
         draw_button_with_rounded_corners(reset_button_text, reset_button_rect, reset_button_color, reset_button_text_color, 65, radius=10)
+        
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -320,27 +319,35 @@ def main():
                 sys.exit()
                 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if ip_input_box.collidepoint(event.pos):
-                    ip_active = not ip_active
-                    port_active = False
-                elif port_input_box.collidepoint(event.pos):
-                    port_active = not port_active
-                    ip_active = False
-                    
-                elif reset_button_rect.collidepoint(event.pos):
-                    reset_server(ip_text, int(port_text))
-                
-                elif connect_button_rect.collidepoint(event.pos):
-                    if ip_text and port_text and connect == False:
-                        if connect_to_server(ip_text, int(port_text)):
-                            state = "connected"
-                            connect = True
-                            connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
-                            connect_button_text = "Connected"
-                            connect_button_text_color = BLACK
-                            connect_button_text_offsetX = 40
-
+                if state == "start":
+                    if ip_input_box.collidepoint(event.pos):
+                        ip_active = not ip_active
+                        port_active = False
+                        name_active = False
                         
+                    elif port_input_box.collidepoint(event.pos):
+                        port_active = not port_active
+                        ip_active = False
+                        name_active = False
+                    
+                    elif name_input_box.collidepoint(event.pos):
+                        name_active = not name_active
+                        ip_active = False
+                        port_active = False
+                        
+                    elif reset_button_rect.collidepoint(event.pos):
+                        reset_server(ip_text, int(port_text))
+                    
+                    elif connect_button_rect.collidepoint(event.pos):
+                        if ip_text and port_text and name_text and connect == False:
+                            if connect_to_server(ip_text, int(port_text), name_text):
+                                state = "connected"
+                                connect = True
+                                connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
+                                connect_button_text = "Connected"
+                                connect_button_text_color = BLACK
+                                connect_button_text_offsetX = 40
+
                 elif ready_button_rect.collidepoint(event.pos):
                         if state == "connected":
                             state = "ready"
@@ -356,8 +363,10 @@ def main():
                 else:
                     ip_active = False
                     port_active = False
+                    name_active = False
                 ip_color = ip_color_active if ip_active else ip_color_inactive
                 port_color = port_color_active if port_active else port_color_inactive
+                name_color = name_color_active if name_active else name_color_inactive
 
             if event.type == pygame.KEYDOWN:
                 if ip_active:
@@ -370,20 +379,21 @@ def main():
                         port_text = port_text[:-1]
                     elif event.unicode.isdigit():                                   
                         port_text += event.unicode
-        
+                elif name_active:
+                    if event.key == pygame.K_BACKSPACE:                                
+                        name_text = name_text[:-1]
+                    else:                                   
+                        name_text += event.unicode
 
         if state == "connected":
             # Draw Ready Button
             draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
-            #pygame.draw.rect(screen, ready_button_color, ready_button_rect)
-            #draw_text(ready_button_text, ready_button_text_color, 800, 710)
+
             get_players_status(ip_text, int(port_text))
  
         elif state == "ready":
             # Draw Ready Button
             draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
-            #pygame.draw.rect(screen, ready_button_color, ready_button_rect)
-            #draw_text(ready_button_text, ready_button_text_color, 800, 710)
 
             get_players_status(ip_text, int(port_text))
             
@@ -391,7 +401,7 @@ def main():
                 state = "start_game"
             
         elif state == "start_game":
-            arguments = [ str(id) , str(posX) , str(posY) , str(ip_text), str(port_text)]
+            arguments = [ str(id) , str(posX) , str(posY) , str(ip_text), str(port_text), str(name_text)]
             
             subprocess.Popen(["python", "game.py"] + arguments)
             pygame.quit()

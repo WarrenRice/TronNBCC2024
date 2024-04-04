@@ -16,12 +16,12 @@ PROPERTY_DELIMETER = "▐";
 arguments = sys.argv[1:]  # Exclude the first argument, which is the script filename
 
 # Use arguments as needed
-# print("Arguments:", arguments)
+# print("Arguments:", arguments[5])
 # print(arguments)
 
 class MAIN:
     def __init__(self, size):
-        self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]))
+        self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]),arguments[5])
         self.map = MAP(size)
         self.load_map("maps/map2.txt")
     
@@ -36,7 +36,7 @@ class MAIN:
                 
                 data = content.split('|')  # Split the content by '|' to get individual coordinates
                 coordinates = [tuple(map(int, coord.split(','))) for coord in data]  # Convert each coordinate string to a tuple of integers
-            print("Coordinates loaded successfully:", coordinates)
+            #print("Coordinates loaded successfully:", coordinates)
             for _ in range(len(coordinates)):
                 #print(coordinates[_][0])
                 self.map.setValue(coordinates[_][0], coordinates[_][1], 5)
@@ -134,7 +134,7 @@ class MAIN:
             client_socket.sendall(message.encode())
             data = client_socket.recv(1024)
             
-            print(data.decode())
+            #print(data.decode())
         
             client_socket.close()
         
@@ -179,7 +179,6 @@ class MAIN:
                 # Append the modified subarray to the result list
                 players.append(elements)
             #print(others_players)
-            count = 0
             for idx in range(len(players)):
                 #print("test")
                 if (players[idx] == 'IGNORE'):
@@ -223,7 +222,6 @@ SERVER_PORT = int(arguments[4])
 # Font
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-font = pygame.font.Font(None, 36)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,300)
@@ -232,9 +230,35 @@ dead_list = []
 
 mainGame = MAIN(cellNumber)
 
-def draw_text(ip_text, ip_color, x, y):
-    ip_text_surface = font.render(ip_text, True, ip_color)
-    screen.blit(ip_text_surface, (x, y))
+
+def draw_text(text, color, x, y, size=36):  # Default font size is 36
+    font = pygame.font.Font(None, size)
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, (x, y))
+
+
+def draw_rounded_rectangle(surface, color, rect, radius=20):
+    pygame.draw.rect(surface, color, rect, border_radius=radius)
+
+def show_popup_message(message):
+    popup_screen = pygame.display.set_mode((300, 200))  # Define pop-up window size
+    popup_screen.fill((255, 255, 255))  # Fill pop-up window with white background
+
+    font = pygame.font.Font(None, 36)  # Set font and size for the message
+    text_surface = font.render(message, True, (0, 0, 0))  # Render the message
+
+    # Calculate position to center the message on the pop-up window
+    text_rect = text_surface.get_rect(center=(150, 100))
+
+    popup_screen.blit(text_surface, text_rect)  # Draw the message on the pop-up window
+
+    pygame.display.flip()  # Update the pop-up window display
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
 while True:
     #draw all elements
@@ -269,13 +293,20 @@ while True:
     
     # Check if player is alive
     if not mainGame.player.alive:
-        draw_text("You Lose", WHITE, cellSize *cellNumber/2-55, cellSize *cellNumber/2)  # Display "You Lose" text
+        rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
+        draw_rounded_rectangle(screen, (255, 255, 255, 128), rounded_rect)  # 50% transparent black
+        draw_text("You Lose", BLACK, cellSize *cellNumber/2-110, cellSize *cellNumber/2-20, size=72)  # Display "You Lose" text
+        #show_popup_message("You Lose")  # Display pop-up window with "You Lose" message
+    
     elif mainGame.player.you_win:
-        draw_text("You Won", WHITE, cellSize *cellNumber/2-55, cellSize *cellNumber/2)
-       
+        rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
+        draw_rounded_rectangle(screen, (255, 255, 255, 128), rounded_rect)  # 50% transparent black
+        draw_text("You Won", BLACK, cellSize *cellNumber/2-105, cellSize *cellNumber/2-25, size=72)
+        #show_popup_message("You Won")  # Display pop-up window with "You Won" message
+        
     hud = pygame.Rect(0,cellSize *cellNumber,cellSize *cellNumber,cellSize *cellNumber+50)
     pygame.draw.rect(screen, (125,125,125), hud)   
-    draw_text("You are player " + str(mainGame.player.id + 1), mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)
+    draw_text(mainGame.player.name + " are player " + str(mainGame.player.id + 1), mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)
     draw_text("(Press Arrow Keys or 'W','A','S','D' to move)", mainGame.map.use_color[mainGame.player.id+1], 250, cellSize *cellNumber+12)
     #draw_text("Note: press Arrow Keys or 'W','A','S','D' to move", 200, cellSize *cellNumber+12)
     
