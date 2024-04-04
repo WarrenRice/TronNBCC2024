@@ -6,6 +6,7 @@ from first.map import MAP
 # 
 # rounded corner
 # disconnect methods in lobby
+# add maps
 # players die when disconnect
 # make lose become spectator
 
@@ -22,7 +23,7 @@ class MAIN:
     def __init__(self, size):
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]))
         self.map = MAP(size)
-        self.load_map("maps/map.txt")
+        self.load_map("maps/map2.txt")
     
     def load_map(self, file_path):
         try:
@@ -31,13 +32,13 @@ class MAIN:
                 
                 if not content:
                     print("File is empty.")
-                return None
+                    return None
                 
                 data = content.split('|')  # Split the content by '|' to get individual coordinates
                 coordinates = [tuple(map(int, coord.split(','))) for coord in data]  # Convert each coordinate string to a tuple of integers
             print("Coordinates loaded successfully:", coordinates)
             for _ in range(len(coordinates)):
-                print(coordinates[_][0])
+                #print(coordinates[_][0])
                 self.map.setValue(coordinates[_][0], coordinates[_][1], 5)
             return coordinates
         except FileNotFoundError:
@@ -51,7 +52,7 @@ class MAIN:
 
         if self.player.alive:
             if not self.player.you_win:
-                self.player.move() #update position
+                
     
                 try:
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -72,6 +73,8 @@ class MAIN:
                         
                 except Exception as e:
                     print("Main update error:", e)
+                    
+                self.player.move() #update position
             else:
                 self.get_positions()
 
@@ -177,6 +180,7 @@ class MAIN:
                 #print("test")
 
                 if not (_id == self.player.id) and not (_id in dead_list):
+                #if not (_id in dead_list):
                     #print("players[_index]")
                     #print(players[_id])
                     #print(int(len(players[_index])-1)/2)

@@ -248,7 +248,8 @@ def main():
     ip_active = False
     #ip_text = '25.42.224.13'
     #ip_text = '25.41.59.168'
-    ip_text = 'localhost'
+    #ip_text = 'localhost'
+    ip_text = '25.34.232.141'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
