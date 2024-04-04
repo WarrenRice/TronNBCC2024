@@ -3,6 +3,11 @@ from pygame.math import Vector2
 from first.player import PLAYER
 from first.map import MAP
 
+# 
+# rounded corner
+# disconnect methods in lobby
+# players die when disconnect
+# make lose become spectator
 
 PROPERTY_DELIMETER = "▐";
 
@@ -17,41 +22,70 @@ class MAIN:
     def __init__(self, size):
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]))
         self.map = MAP(size)
-        
+        self.load_map("maps/map.txt")
+    
+    def load_map(self, file_path):
+        try:
+            with open(file_path, 'r') as file:
+                content = file.read().strip()  # Read the content and remove leading/trailing whitespace
+                
+                if not content:
+                    print("File is empty.")
+                return None
+                
+                data = content.split('|')  # Split the content by '|' to get individual coordinates
+                coordinates = [tuple(map(int, coord.split(','))) for coord in data]  # Convert each coordinate string to a tuple of integers
+            print("Coordinates loaded successfully:", coordinates)
+            for _ in range(len(coordinates)):
+                print(coordinates[_][0])
+                self.map.setValue(coordinates[_][0], coordinates[_][1], 5)
+            return coordinates
+        except FileNotFoundError:
+            print("File not found.")
+            return None
+        except Exception as e:
+            print("An error occurred:", e)
+            return None
+    
     def update(self):
 
         if self.player.alive:
-            self.player.move() #update position
-
-            try:
-                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
-                message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + PROPERTY_DELIMETER + str(int(self.player.pos.x)) + PROPERTY_DELIMETER + str(int(self.player.pos.y)) + "\n"
-                client_socket.sendall(message.encode())
-                client_socket.recv(1024)
-                client_socket.close()
-            except Exception as e:
-                print("Save Position error", e)
-                
-            self.get_positions()
+            if not self.player.you_win:
+                self.player.move() #update position
     
-            try:
-                self.checkCollision()
-                if (self.player.pos.x >= 0 and self.player.pos.x < self.map.size and self.player.pos.y >= 0 and self.player.pos.y < self.map.size):
-                    self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),(self.player.id+1))
+                try:
+                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+                    message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + PROPERTY_DELIMETER + str(int(self.player.pos.x)) + PROPERTY_DELIMETER + str(int(self.player.pos.y)) + "\n"
+                    client_socket.sendall(message.encode())
+                    client_socket.recv(1024)
+                    client_socket.close()
+                except Exception as e:
+                    print("Save Position error", e)
                     
-            except Exception as e:
-                print("Main update error:", e)
+                self.get_positions()
+        
+                try:
+                    self.checkCollision()
+                    if (self.player.pos.x >= 0 and self.player.pos.x < self.map.size and self.player.pos.y >= 0 and self.player.pos.y < self.map.size):
+                        self.map.setValue(int(self.player.pos.x),int(self.player.pos.y),(self.player.id+1))
+                        
+                except Exception as e:
+                    print("Main update error:", e)
+            else:
+                self.get_positions()
 
         else:
-            
             if self.player.remove == False:
                 
                 self.remove_by_id(self.player.id)
-                   
-                self.get_positions()        
+                
+                self.get_positions()
 
-            self.player.remove = True
+                self.player.remove = True
+                
+            else:
+                self.get_positions()
             
     def remove_by_id(self, _id):
         for _row in range(cellNumber):
@@ -70,9 +104,7 @@ class MAIN:
                 #if (self.player.alive):
                 self.player.alive = False
                 self.set_dead()
-            
-            
-            
+
             #if not (0 <= self.player.pos.x <= cellNumber) or not (0 <= self.player.pos.y <= cellNumber) :
                 
             else:
@@ -210,16 +242,16 @@ while True:
             mainGame.update()
 
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+            if event.key == pygame.K_UP or event.key == pygame.K_w:
                 if mainGame.player.direction.y != 1:
                     mainGame.player.direction = Vector2(0,-1)
-            elif event.key == pygame.K_DOWN:
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
                 if mainGame.player.direction.y != -1:
                     mainGame.player.direction = Vector2(0,1)
-            elif event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 if mainGame.player.direction.x != 1:
                     mainGame.player.direction = Vector2(-1,0)
-            elif event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 if mainGame.player.direction.x != -1:
                     mainGame.player.direction = Vector2(1,0)
 
@@ -228,14 +260,15 @@ while True:
     
     # Check if player is alive
     if not mainGame.player.alive:
-        draw_text("You Lose", WHITE, 200, 200)  # Display "You Lose" text
+        draw_text("You Lose", WHITE, cellSize *cellNumber/2-55, cellSize *cellNumber/2)  # Display "You Lose" text
     elif mainGame.player.you_win:
-        draw_text("You Won", WHITE, 200, 200)
+        draw_text("You Won", WHITE, cellSize *cellNumber/2-55, cellSize *cellNumber/2)
        
     hud = pygame.Rect(0,cellSize *cellNumber,cellSize *cellNumber,cellSize *cellNumber+50)
     pygame.draw.rect(screen, (125,125,125), hud)   
-    draw_text("you are " + str(mainGame.player.id), mainGame.map.use_color[mainGame.player.id+1], 200, cellSize *cellNumber+20)
-    
+    draw_text("You are player " + str(mainGame.player.id + 1), mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)
+    draw_text("(Press Arrow Keys or 'W','A','S','D' to move)", mainGame.map.use_color[mainGame.player.id+1], 250, cellSize *cellNumber+12)
+    #draw_text("Note: press Arrow Keys or 'W','A','S','D' to move", 200, cellSize *cellNumber+12)
     
     pygame.display.update()
     clock.tick(60) #60 frame/second add comments properly

@@ -4,6 +4,7 @@ import pygame
 import subprocess
 from first.gameColor import COLOR
 
+
 # Initialize Pygame
 pygame.init()
 
@@ -372,12 +373,8 @@ def main():
             draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
             #pygame.draw.rect(screen, ready_button_color, ready_button_rect)
             #draw_text(ready_button_text, ready_button_text_color, 800, 710)
-            
             get_players_status(ip_text, int(port_text))
-            
-
-
-            
+ 
         elif state == "ready":
             # Draw Ready Button
             draw_button_with_rounded_corners(ready_button_text, ready_button_rect, ready_button_color, ready_button_text_color, 60, radius=10)
