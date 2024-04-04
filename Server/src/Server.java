@@ -84,6 +84,12 @@ public class Server extends Thread {
 				gameManager.savePlayerPosition(playerId, posX, posY);
 				return "Successully saved the position";
 			}
+			if (clientInput.contains("DISCONNECTED")) {
+				String[] splitInput = clientInput.split(PROPERTY_DELIMETER);
+				int playerId = Integer.parseInt(splitInput[1]);
+				gameManager.removePlayer(playerId);
+				return "Successfully removed the player";
+			}	
 			
 			if (clientInput.contains("DIE")) {
 				String[] splitInput = clientInput.split(PROPERTY_DELIMETER);

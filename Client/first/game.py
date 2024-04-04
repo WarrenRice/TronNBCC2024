@@ -162,37 +162,42 @@ class MAIN:
             
             
             #print("--------------------")
+            # print(list(data_array))
             for sub_array in data_array:
+                if (sub_array == 'IGNORE'):
+                    # players.append(sub_array)
+                    continue
+                
                 sub_array = sub_array[:-1]
                 #print(sub_array)
                 # Split the subarray by "," character
                 elements = sub_array.split(",")
                 
                 # Convert the numeric elements to integers
-                elements[1:] = [int(x) for x in elements[1:]]
+                elements[2:] = [int(x) for x in elements[2:]]
                 #print(elements)
                 # Append the modified subarray to the result list
                 players.append(elements)
-            
             #print(others_players)
             count = 0
-            for _id in range(len(players)):
+            for idx in range(len(players)):
                 #print("test")
-
+                if (players[idx] == 'IGNORE'):
+                    continue
+                _id = int(players[idx][0])
                 if not (_id == self.player.id) and not (_id in dead_list):
                 #if not (_id in dead_list):
-                    #print("players[_index]")
-                    #print(players[_id])
-                    #print(int(len(players[_index])-1)/2)
-                    if (players[_id][0] == 'A'):
-                        back_tail = int((len(players[_id])-1)/2)
+                    # print("players[_index]")
+                    # print(players[_id])
+                    # print(int(len(players[idx])-1)/2)
+                    if (players[idx][1] == 'A'):
+                        back_tail = int((len(players[idx])-1)/2)
                         for _tIndex in range(back_tail):
-                            self.map.setValue(players[_id][_tIndex*2+1],players[_id][_tIndex*2+2],_id+1)
+                            self.map.setValue(players[idx][_tIndex*2+2],players[idx][_tIndex*2+3],_id+1)
                     else:
                         dead_list.append(_id)
                         self.remove_by_id(_id)
-
-
+            
             if (len(dead_list) > len(players)-2):
                 self.player.you_win = True
             

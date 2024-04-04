@@ -3,7 +3,6 @@ import java.util.List;
 
 public class Player {
 	private int playerId;
-	private int color;
 	private int posX;
 	private int posY;
 	private boolean ready;
@@ -12,9 +11,8 @@ public class Player {
 	private List<Integer> previousPosX;
 	private List<Integer> previousPosY;
 	
-	public Player(int playerId, int color, int posX, int posY) {
+	public Player(int playerId, int posX, int posY) {
 		this.playerId = playerId;
-		this.color = color;
 		this.posX = posX;
 		this.posY = posY;
 		this.ready = false;
@@ -29,12 +27,7 @@ public class Player {
 	public void setPlayerId(int playerId) {
 		this.playerId = playerId;
 	}
-	public int getColor() {
-		return color;
-	}
-	public void setColor(int color) {
-		this.color = color;
-	}
+
 	public int getPosX() {
 		return posX;
 	}
