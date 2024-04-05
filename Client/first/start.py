@@ -6,6 +6,8 @@ from first.gameColor import COLOR
 
 #ADD NAME
 #AFTER CONNECTION BUG
+#NOTICE WHEN EMPTY NAME
+#NOTICE WHEN LOBBY FULL
 
 # Initialize Pygame
 pygame.init()
@@ -37,6 +39,7 @@ id = -1
 posX = -1
 posY = -1
 name = ""
+
 
 def draw_text(ip_text, ip_color, x, y):
     ip_text_surface = font.render(ip_text, True, ip_color)
@@ -121,6 +124,7 @@ def set_ready(ip, port):
 
 def connect_to_server(ip, port, _name):
     global id, posX, posY
+    
     try:
         
         # Create a socket object
@@ -165,7 +169,7 @@ def connect_to_server(ip, port, _name):
         return True
         
     except Exception as e:
-        print("Connection error:", e)
+        print("Lobby Full:", e)
         return None
     
 def reset_server(ip, port):
@@ -224,13 +228,15 @@ def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, rad
     draw_text(text, text_color, rect.x + offsetX, rect.y + 12)
 
 def main():
-    global id, posX, posY, start_game
+    global id, posX, posY, start_game, name
     
     # Initialize variables
     state = "start"
     connect = False
     ready = False
     start_game = False
+    no_name = False
+    lobby_full = False
 
 
     ip_input_box = pygame.Rect(250, 345, 140, 36)
@@ -255,7 +261,7 @@ def main():
     name_color_active = pygame.Color('yellow')
     name_color = port_color_inactive
     name_active = False
-    name_text = name    
+    name_text = name
     
     # Connect button
     connect_button_rect = pygame.Rect(50, 500, 200, 50)
@@ -339,14 +345,21 @@ def main():
                         reset_server(ip_text, int(port_text))
                     
                     elif connect_button_rect.collidepoint(event.pos):
-                        if ip_text and port_text and name_text and connect == False:
-                            if connect_to_server(ip_text, int(port_text), name_text):
-                                state = "connected"
-                                connect = True
-                                connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
-                                connect_button_text = "Connected"
-                                connect_button_text_color = BLACK
-                                connect_button_text_offsetX = 40
+                        if ip_text and port_text and connect == False:
+                            if name_text:
+                                no_name = False
+                                if connect_to_server(ip_text, int(port_text), name_text):
+                                    state = "connected"
+                                    connect = True
+                                    connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
+                                    connect_button_text = "Connected"
+                                    connect_button_text_color = BLACK
+                                    connect_button_text_offsetX = 40
+                                    lobby_full = False
+                                else:
+                                    lobby_full = True
+                            else:
+                                no_name = True
 
                 elif ready_button_rect.collidepoint(event.pos):
                         if state == "connected":
@@ -406,6 +419,11 @@ def main():
             subprocess.Popen(["python", "game.py"] + arguments)
             pygame.quit()
             sys.exit()
+               
+        if no_name:
+            draw_text("Name must be filled...", WHITE, 50, 570)
+        elif lobby_full:
+            draw_text("Lobby is full...", WHITE, 50, 570)
 
         # Update the display
         pygame.display.flip()
