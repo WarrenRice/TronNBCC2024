@@ -1,12 +1,18 @@
 import pygame
-from first.gameColor import COLOR
+#from first.gameColor import COLORS
+
+try: 
+    from first.gameColor import COLORS
+except Exception as e:
+    from gameColor import COLORS
+
 
 class MAP:
     def __init__(self, size):
         # Initialize the map with the specified size and set all cells to 0
         self.size = size
         self.map = [[0] * size for _ in range(size)]  # Create a square grid
-        self.use_color = COLOR()  # Initialize the COLOR class to use for cell coloring
+        self.use_color = COLORS()  # Initialize the COLOR class to use for cell coloring
 
     def setValue(self, x, y, value):
         # Set the value of a cell in the map at the specified (x, y) coordinates

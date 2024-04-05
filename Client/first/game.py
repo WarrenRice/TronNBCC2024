@@ -1,9 +1,16 @@
 import pygame, sys, socket
 from pygame.math import Vector2
-from first.player import PLAYER
-from first.map import MAP
+#from first.player import PLAYER
+#from first.map import MAP
 
-# 
+try: 
+    from first.player import PLAYER
+    from first.map import MAP
+except Exception as e:
+    from player import PLAYER
+    from map import MAP
+
+
 # rounded corner
 # disconnect methods in lobby
 # add maps

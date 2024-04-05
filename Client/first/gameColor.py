@@ -1,4 +1,4 @@
-class COLOR:
+class COLORS:
     # Class to manage and access predefined color tuples through index
     _colors = [
         (0, 0, 0),        # 0 BLACK - Represents the color black in RGB format

@@ -2,7 +2,12 @@ import socket
 import sys
 import pygame
 import subprocess
-from first.gameColor import COLOR
+#from first.gameColor import COLORS
+try: 
+    from first.gameColor import COLORS
+except Exception as e:
+    from gameColor import COLORS
+
 
 #ADD NAME
 #AFTER CONNECTION BUG
@@ -20,7 +25,7 @@ PROPERTY_DELIMETER = "▐";
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("- Tron Multiplayer Lobby -")
+pygame.display.set_caption("- Tron Multiplayer Lobby 6-")
 
 # Load images
 background_image = pygame.image.load("Tron2.jpg").convert()  
@@ -33,13 +38,13 @@ font = pygame.font.Font(None, 36)
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-use_color = COLOR()
+use_color = COLORS()
 
 id = -1
 posX = -1
 posY = -1
 name = ""
-
+arguments = ["","","","","",""]
 
 def draw_text(ip_text, ip_color, x, y):
     ip_text_surface = font.render(ip_text, True, ip_color)
@@ -137,7 +142,7 @@ def connect_to_server(ip, port, _name):
         
         # Send player information to the server
         text = "CONNECTION" + PROPERTY_DELIMETER + _name +"\n"
-        text = "CONNECTION" + "\n"
+        #text = "CONNECTION" + "\n"
         
         client_socket.sendall(text.encode())
         data = client_socket.recv(1024)
@@ -228,7 +233,7 @@ def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, rad
     draw_text(text, text_color, rect.x + offsetX, rect.y + 12)
 
 def main():
-    global id, posX, posY, start_game, name
+    global id, posX, posY, start_game, name, arguments
     
     # Initialize variables
     state = "start"
@@ -416,7 +421,8 @@ def main():
         elif state == "start_game":
             arguments = [ str(id) , str(posX) , str(posY) , str(ip_text), str(port_text), str(name_text)]
             
-            subprocess.Popen(["python", "game.py"] + arguments)
+            #subprocess.run(["py", "game.py"] + arguments)
+            subprocess.Popen(["py", "game.py"] + arguments)
             pygame.quit()
             sys.exit()
                
