@@ -7,12 +7,14 @@ public class Player {
 	private int posY;
 	private boolean ready;
 	private boolean alive;
+	private String username;
 	public static final String PROPERTY_DELIMETER = "▐";
 	private List<Integer> previousPosX;
 	private List<Integer> previousPosY;
 	
-	public Player(int playerId, int posX, int posY) {
+	public Player(int playerId, String username, int posX, int posY) {
 		this.playerId = playerId;
+		this.username = username;
 		this.posX = posX;
 		this.posY = posY;
 		this.ready = false;
@@ -26,6 +28,10 @@ public class Player {
 	}
 	public void setPlayerId(int playerId) {
 		this.playerId = playerId;
+	}
+	
+	public String getUsername() {
+		return username;
 	}
 
 	public int getPosX() {
@@ -75,7 +81,7 @@ public class Player {
 	
 	public String getLobbyStatus() {
 		String status = ready ? "R" : "N";
-		return status + "," + getPosition();
+		return status + "," + username + "," + getPosition();
 	}
 	
 	public void setPosition(int posX, int posY) {

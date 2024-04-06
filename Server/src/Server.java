@@ -54,8 +54,9 @@ public class Server extends Thread {
 		System.out.println(clientInput);
 		
 		try {
-			if (clientInput.equals("CONNECTION")) {
-				return gameManager.addNewPlayer().toString();
+			if (clientInput.contains("CONNECTION")) {
+				String username = clientInput.split(PROPERTY_DELIMETER)[1];
+				return gameManager.addNewPlayer(username).toString();
 			}
 			if (clientInput.equals("GET_PLAYERS")) {
 				return gameManager.getPlayerLobbyStatus();

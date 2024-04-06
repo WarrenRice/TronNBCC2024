@@ -88,7 +88,8 @@ def get_players_status(ip, port):
         for _ in range(len(split_data)):
             if (split_data[_][0] == "IGNORE"): # ignore player spot not filled
                 continue
-            draw_text("you" if id == _ else ("Player" + str(_+1)), use_color[_+1], 500, 380+_*40)
+            player_name = split_data[_][1]
+            draw_text("you" if id == _ else (player_name), use_color[_+1], 500, 380+_*40)
             screen.blit(green_tick_image if split_data[_][0] == "R" else red_tick_image, (670, 380+_*40))
         
 
@@ -251,8 +252,8 @@ def main():
     ip_active = False
     #ip_text = '25.42.224.13'
     #ip_text = '25.41.59.168'
-    #ip_text = 'localhost'
-    ip_text = '25.34.232.141'
+    ip_text = 'localhost'
+    # ip_text = '25.34.232.141'
 
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')

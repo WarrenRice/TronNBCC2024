@@ -14,7 +14,7 @@ public class GameManager {
 		playerMap = new HashMap<>();
 	}
 	
-	public Player addNewPlayer() throws Exception {
+	public Player addNewPlayer(String username) throws Exception {
 		if (playerMap.size() >= 4) {
 			throw new Exception("Lobby is full!");
 		}
@@ -27,7 +27,7 @@ public class GameManager {
 			}
 		}
 		int[] playerPos = getInitialPosition(id);
-		Player newPlayer = new Player(id, playerPos[0], playerPos[1]);
+		Player newPlayer = new Player(id, username, playerPos[0], playerPos[1]);
 //		playerList.add(newPlayer);
 		playerMap.put(id, newPlayer);
 		return newPlayer;
@@ -87,10 +87,6 @@ public class GameManager {
 	// function for obtaining lobby status of players
 	public String getPlayerLobbyStatus() {
 		String playerStatus = "";
-//		for (Player p : playerMap.values()) {
-//			playerStatus += p.getLobbyStatus() + PROPERTY_DELIMETER;
-//		}
-		
 		for (int i = 0; i < 4; i++) {
 			Player p = playerMap.get(i);
 			if (p != null) {
