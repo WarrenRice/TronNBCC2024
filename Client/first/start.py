@@ -14,6 +14,14 @@ except Exception as e:
 #NOTICE WHEN EMPTY NAME
 #NOTICE WHEN LOBBY FULL
 
+
+#TODO
+#Add Comments 
+#Remove Reset
+#Call RESET When game is over
+#Don't Start When There is only one player
+
+
 # Initialize Pygame
 pygame.init()
 
