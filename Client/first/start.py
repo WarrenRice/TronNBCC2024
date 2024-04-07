@@ -28,6 +28,7 @@ pygame.init()
 # Screen dimensions
 SCREEN_WIDTH = 1110
 SCREEN_HEIGHT = 800
+# Delimiter used in networking for separating data
 
 PROPERTY_DELIMETER = "▐";
 
@@ -48,17 +49,23 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 use_color = COLORS()
 
+# Player and game state initialization
+
 id = -1
 posX = -1
 posY = -1
 name = ""
 arguments = ["","","","","",""]
-
+"""
+    Function to render text on the screen.
+"""
 def draw_text(ip_text, ip_color, x, y):
     ip_text_surface = font.render(ip_text, True, ip_color)
     screen.blit(ip_text_surface, (x, y))
 
-
+"""
+    Function to retrieve and display the status of players in the lobby.
+"""
 def get_players_status(ip, port):
     global id, start_game;
     try:
@@ -89,7 +96,8 @@ def get_players_status(ip, port):
         
         # Remove the last element from the list
         split_data = split_data[:-1]
-        
+                # Display the player statuses in the lobby
+
         draw_text("LOBBY ", WHITE, 500, 340)
         draw_text("STATUS ", WHITE, 640, 340)
         
@@ -109,8 +117,11 @@ def get_players_status(ip, port):
        
     except Exception as e:
         print("get_players_status error:", e)
-    
+"""
+    Function to set the current player's status to ready.
+"""    
 def set_ready(ip, port):
+    
     try:
 
         # Create a socket object
@@ -135,7 +146,9 @@ def set_ready(ip, port):
     except Exception as e:
         print("Connection error:", e)
         return None
-
+"""
+    Function to connect to the game server and register the player.
+"""
 def connect_to_server(ip, port, _name):
     global id, posX, posY
     
@@ -185,7 +198,7 @@ def connect_to_server(ip, port, _name):
     except Exception as e:
         print("Lobby Full:", e)
         return None
-    
+# TO reset server   
 def reset_server(ip, port):
     try:
 
@@ -209,7 +222,7 @@ def reset_server(ip, port):
         
     except Exception as e:
         print("Connection error:", e)
-        
+# To Disconnect server         
 def disconnect_server(ip, port):
     try:
 
@@ -233,18 +246,37 @@ def disconnect_server(ip, port):
         
     except Exception as e:
         print("disconnect_server error:", e)
+"""
+    Draws a rounded rectangle on the specified surface.
 
+    :param surface: The pygame surface on which to draw the rectangle.
+    :param color: The color of the rectangle, defined as an RGB tuple.
+    :param rect: A pygame Rect object defining the rectangle's position and size.
+    :param radius: The radius of the rounded corners.
+"""
 def draw_rounded_rect(surface, color, rect, radius=10):
     pygame.draw.rect(surface, color, rect, border_radius=radius)
+    
+"""
+    Draws a button with rounded corners on the screen. This function also centers
+    the text within the button.
 
+    :param text: The text to display on the button.
+    :param rect: A pygame Rect object defining the button's position and size.
+    :param color: The color of the button, defined as an RGB tuple.
+    :param text_color: The color of the text, defined as an RGB tuple.
+    :param offsetX: Horizontal offset for the text to help center it on the button.
+    :param radius: The radius of the button's rounded corners.
+"""    
 def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, radius=10):
     draw_rounded_rect(screen, color, rect, radius)
     draw_text(text, text_color, rect.x + offsetX, rect.y + 12)
+# Main function controlling the lobby interface and logic
 
 def main():
     global id, posX, posY, start_game, name, arguments
     
-    # Initialize variables
+    # Initialize the main variables for the lobby state
     state = "start"
     connect = False
     ready = False
@@ -252,6 +284,7 @@ def main():
     no_name = False
     lobby_full = False
 
+    # Setup input boxes for IP
 
     ip_input_box = pygame.Rect(250, 345, 140, 36)
     ip_color_inactive = pygame.Color('gray')
@@ -262,7 +295,8 @@ def main():
     #ip_text = '25.41.59.168'
     ip_text = 'localhost'
     # ip_text = '25.34.232.141'
-
+    
+    # Setup input boxes for  port
     port_input_box = pygame.Rect(250, 395, 140, 36)
     port_color_inactive = pygame.Color('gray')
     port_color_active = pygame.Color('yellow')
@@ -270,6 +304,8 @@ def main():
     port_active = False
     port_text = '6066'
     
+    # Setup input boxes for  player name
+
     name_input_box = pygame.Rect(250, 445, 140, 36)
     name_color_inactive = pygame.Color('gray')
     name_color_active = pygame.Color('yellow')
@@ -297,20 +333,24 @@ def main():
     reset_button_text = "Reset"
     reset_button_text_color = WHITE
     
-    while True:
+    while True:    # Main loop for the lobby interface
+
         # Draw the background image
         screen.fill(BLACK)
         screen.blit(background_image, (0, 0))
         
         # Draw UI elements
         #Player Input Box
+        # Handling input boxes and drawing them on the screen
+
         draw_text("Enter Server IP:", WHITE, 50, 350)
         txt_surface = font.render(ip_text, True, WHITE)
         width = max(200, txt_surface.get_width()+10)
         ip_input_box.w = width
         screen.blit(txt_surface, (ip_input_box.x+5, ip_input_box.y+5))
         pygame.draw.rect(screen, ip_color, ip_input_box, 2)
-        
+        # Handling input boxes and drawing them on the screen
+
         draw_text("Enter Port:", WHITE, 50, 400)
         txt_surface = font.render(port_text, True, WHITE)
         width = max(200, txt_surface.get_width()+10)
@@ -325,11 +365,13 @@ def main():
         screen.blit(txt_surface, (name_input_box.x+5, name_input_box.y+5))
         pygame.draw.rect(screen, name_color, name_input_box, 2)
 
-        # Draw Buttons
+        # Handling buttons and their interactions
+
         draw_button_with_rounded_corners(connect_button_text, connect_button_rect, connect_button_color, connect_button_text_color, connect_button_text_offsetX, radius=10)
 
         draw_button_with_rounded_corners(reset_button_text, reset_button_rect, reset_button_color, reset_button_text_color, 65, radius=10)
         
+        # Event handling for user inputs
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -338,6 +380,8 @@ def main():
                 pygame.quit()
                 sys.exit()
                 
+                # Input box and button interaction logic
+   
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if state == "start":
                     if ip_input_box.collidepoint(event.pos):
@@ -391,10 +435,13 @@ def main():
                     ip_active = False
                     port_active = False
                     name_active = False
+                    
+                # Update the color of the input boxes based on activity
                 ip_color = ip_color_active if ip_active else ip_color_inactive
                 port_color = port_color_active if port_active else port_color_inactive
                 name_color = name_color_active if name_active else name_color_inactive
-
+                
+            # Keyboard interaction for input boxes
             if event.type == pygame.KEYDOWN:
                 if ip_active:
                     if event.key == pygame.K_BACKSPACE:                                
@@ -411,6 +458,8 @@ def main():
                         name_text = name_text[:-1]
                     else:                                   
                         name_text += event.unicode
+                        
+        # State handling for game readiness and starting
 
         if state == "connected":
             # Draw Ready Button
@@ -434,7 +483,9 @@ def main():
             subprocess.Popen(["py", "game.py"] + arguments)
             pygame.quit()
             sys.exit()
-               
+            
+        # Display warnings if the name is not filled or the lobby is full
+         
         if no_name:
             draw_text("Name must be filled...", WHITE, 50, 570)
         elif lobby_full:

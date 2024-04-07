@@ -17,6 +17,8 @@ except Exception as e:
 # players die when disconnect
 # make lose become spectator
 
+# Constants and global variables
+
 PROPERTY_DELIMETER = "▐";
 
 # Access arguments
@@ -25,13 +27,15 @@ arguments = sys.argv[1:]  # Exclude the first argument, which is the script file
 # Use arguments as needed
 # print("Arguments:", arguments[5])
 # print(arguments)
+# MAIN class manages the game state, including players and the map
 
 class MAIN:
     def __init__(self, size):
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]),arguments[5])
         self.map = MAP(size)
         self.load_map("maps/map2.txt")
-    
+    # Load map data from a specified file and set map values accordingly
+
     def load_map(self, file_path):
         try:
             with open(file_path, 'r') as file:
@@ -55,13 +59,15 @@ class MAIN:
             print("An error occurred:", e)
             return None
     
-    def update(self):
+    def update(self):    # Main game update loop: handles player movement, collisions, and networking
+
 
         if self.player.alive:
-            if not self.player.you_win:
+            if not self.player.you_win:  # Handle player movement and interactions
+
                 
     
-                try:
+                try:# to save player position
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
                     message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + PROPERTY_DELIMETER + str(int(self.player.pos.x)) + PROPERTY_DELIMETER + str(int(self.player.pos.y)) + "\n"
@@ -97,17 +103,20 @@ class MAIN:
             else:
                 self.get_positions()
             
-    def remove_by_id(self, _id):
+    def remove_by_id(self, _id): # Remove player's presence from the map based on their ID
+
         for _row in range(cellNumber):
             for _col in range(cellNumber):
                 if self.map.getValue(_col, _row) == (_id+1) :
                     self.map.setValue(_col,_row,0)
 
-    def draw(self):
+    def draw(self):    # Draw game elements on the screen
+
         self.player.draw(screen,cellSize)
         self.map.drawMap(screen,cellSize)
 
-    def checkCollision(self):
+    def checkCollision(self):    # Check for collisions and update player status
+
 
         try:
             if self.player.pos.x < 0 or self.player.pos.x > cellNumber-1 or self.player.pos.y < 0 or self.player.pos.y > cellNumber-1:
@@ -132,7 +141,8 @@ class MAIN:
         except Exception as e:
             print("Collision error:", e)
 
-    def set_dead(self):
+    def set_dead(self):    # Handle player death in the game
+
         try:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
@@ -148,7 +158,8 @@ class MAIN:
         except Exception as e:
             print("Connection error:", e)     
     
-    def get_positions(self):
+    def get_positions(self):    # Retrieve and process the positions of all players from the server
+
         try:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
@@ -215,6 +226,7 @@ class MAIN:
         pygame.quit()
         sys.exit()
         
+# Initialize Pygame and set up the display
 
 pygame.init()
 cellSize = 8#16
@@ -222,30 +234,37 @@ cellNumber = 100#40
 screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber + 50))
 clock = pygame.time.Clock()
 
-# Set up networking
+# Networking setup
+
 SERVER_ADDRESS = arguments[3]  # Change this to your server's IP address
 SERVER_PORT = int(arguments[4])
 
 # Font
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+# Set up the event for screen update
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,300)
 
+# List to keep track of dead players
 dead_list = []
 
+# Create the main game object
 mainGame = MAIN(cellNumber)
-
+# Function to draw text on the screen
 
 def draw_text(text, color, x, y, size=36):  # Default font size is 36
     font = pygame.font.Font(None, size)
     text_surface = font.render(text, True, color)
     screen.blit(text_surface, (x, y))
 
+# Function to draw rounded rectangles (used for pop-up messages, etc.)
 
 def draw_rounded_rectangle(surface, color, rect, radius=20):
     pygame.draw.rect(surface, color, rect, border_radius=radius)
+    
+# Main game loop: handles events, updates game state, and draws game elements
 
 def show_popup_message(message):
     popup_screen = pygame.display.set_mode((300, 200))  # Define pop-up window size
@@ -281,7 +300,7 @@ while True:
         if event.type == SCREEN_UPDATE:
             mainGame.update()
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN:# movement (w,a,s,d)to move the player
             if event.key == pygame.K_UP or event.key == pygame.K_w:
                 if mainGame.player.direction.y != 1:
                     mainGame.player.direction = Vector2(0,-1)

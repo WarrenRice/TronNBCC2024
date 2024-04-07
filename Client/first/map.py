@@ -1,8 +1,8 @@
 import pygame
 #from first.gameColor import COLORS
-
+# try and catch 
 try: 
-    from first.gameColor import COLORS
+    from first.gameColor import COLORS 
 except Exception as e:
     from gameColor import COLORS
 
