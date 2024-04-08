@@ -89,7 +89,7 @@ def get_players_status(ip, port):
             if (split_data[_][0] == "IGNORE"): # ignore player spot not filled
                 continue
             player_name = split_data[_][1]
-            draw_text("you" if id == _ else (player_name), use_color[_+1], 500, 380+_*40)
+            draw_text(str(player_name) + " (You)" if id == _ else (player_name), use_color[_+1], 500, 380+_*40)
             screen.blit(green_tick_image if split_data[_][0] == "R" else red_tick_image, (670, 380+_*40))
         
 
