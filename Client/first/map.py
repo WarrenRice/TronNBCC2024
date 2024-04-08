@@ -4,7 +4,13 @@ import pygame
 try: 
     from first.gameColor import COLORS 
 except Exception as e:
+    print(e)
+    
+    
+try: 
     from gameColor import COLORS
+except Exception as e:
+    print(e)
 
 
 class MAP:

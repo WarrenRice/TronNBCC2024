@@ -7,15 +7,16 @@ try:
     from first.player import PLAYER
     from first.map import MAP
 except Exception as e:
+    print(e)
+
+
+try: 
     from player import PLAYER
     from map import MAP
+except Exception as e:
+    print(e)
 
 
-# rounded corner
-# disconnect methods in lobby
-# add maps
-# players die when disconnect
-# make lose become spectator
 
 # Constants and global variables
 
@@ -28,7 +29,6 @@ arguments = sys.argv[1:]  # Exclude the first argument, which is the script file
 # print("Arguments:", arguments[5])
 # print(arguments)
 # MAIN class manages the game state, including players and the map
-
 class MAIN:
     def __init__(self, size):
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]),arguments[5])
@@ -116,8 +116,7 @@ class MAIN:
         self.map.drawMap(screen,cellSize)
 
     def checkCollision(self):    # Check for collisions and update player status
-
-
+        
         try:
             if self.player.pos.x < 0 or self.player.pos.x > cellNumber-1 or self.player.pos.y < 0 or self.player.pos.y > cellNumber-1:
                 #if (self.player.alive):
@@ -132,12 +131,6 @@ class MAIN:
                     self.player.alive = False
                     self.set_dead()
                     
-            '''
-            for block in self.player.bodys[1:]:
-                if block == self.player.bodys[0]:
-                    #self.gameOver()
-                    pass
-            '''
         except Exception as e:
             print("Collision error:", e)
 
@@ -226,6 +219,25 @@ class MAIN:
         pygame.quit()
         sys.exit()
         
+    # TO reset server     
+    def reset_server(self):
+        try:
+            # Create a socket object
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            
+            # Connect to the server
+            client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
+            
+            # Send player information to the server
+            text = "RESET\n"
+            #text = "RESET\n"
+            client_socket.sendall(text.encode())
+            
+            client_socket.close()
+    
+        except Exception as e:
+            print("reset_server error:", e)    
+
 # Initialize Pygame and set up the display
 
 pygame.init()
@@ -242,8 +254,13 @@ SERVER_PORT = int(arguments[4])
 # Font
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-# Set up the event for screen update
 
+exit_button_rect = pygame.Rect(cellSize *cellNumber/2-100, cellSize *cellNumber/2 + 80, 200, 50)
+exit_button_color = (0,255,0)
+exit_button_text = "Exit"
+exit_button_text_color = BLACK
+
+# Set up the event for screen update
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE,300)
 
@@ -260,9 +277,12 @@ def draw_text(text, color, x, y, size=36):  # Default font size is 36
     screen.blit(text_surface, (x, y))
 
 # Function to draw rounded rectangles (used for pop-up messages, etc.)
-
-def draw_rounded_rectangle(surface, color, rect, radius=20):
+def draw_rounded_rect(surface, color, rect, radius=10):
     pygame.draw.rect(surface, color, rect, border_radius=radius)
+
+def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, radius=10):
+    draw_rounded_rect(screen, color, rect, radius)
+    draw_text(text, text_color, rect.x + offsetX, rect.y + 12)
     
 # Main game loop: handles events, updates game state, and draws game elements
 
@@ -292,8 +312,6 @@ while True:
         if event.type == pygame.QUIT:
             mainGame.player.alive = False
             mainGame.set_dead()
-            #print(mainGame.player.alive)
-            #mainGame.printStm()
             pygame.quit()
             sys.exit()
 
@@ -313,28 +331,40 @@ while True:
             elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 if mainGame.player.direction.x != -1:
                     mainGame.player.direction = Vector2(1,0)
-
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if exit_button_rect.collidepoint(event.pos):
+                mainGame.gameOver()
+                
+                
     screen.fill((25,25,25))
     mainGame.draw()
     
     # Check if player is alive
-    if not mainGame.player.alive:
-        rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
-        draw_rounded_rectangle(screen, (255, 255, 255, 128), rounded_rect)  # 50% transparent black
-        draw_text("You Lose", BLACK, cellSize *cellNumber/2-110, cellSize *cellNumber/2-20, size=72)  # Display "You Lose" text
-        #show_popup_message("You Lose")  # Display pop-up window with "You Lose" message
-    
-    elif mainGame.player.you_win:
-        rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
-        draw_rounded_rectangle(screen, (255, 255, 255, 128), rounded_rect)  # 50% transparent black
-        draw_text("You Won", BLACK, cellSize *cellNumber/2-105, cellSize *cellNumber/2-25, size=72)
-        #show_popup_message("You Won")  # Display pop-up window with "You Won" message
+    if not mainGame.player.alive or mainGame.player.you_win:
+        if not mainGame.player.alive:
+            rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
+            draw_rounded_rect(screen, (255, 255, 255), rounded_rect)  # 50% transparent black
+            draw_text("You Lose", BLACK, cellSize *cellNumber/2-110, cellSize *cellNumber/2-20, size=72)  # Display "You Lose" text
+            #show_popup_message("You Lose")  # Display pop-up window with "You Lose" message
+            
+        else:
+            rounded_rect = pygame.Rect(cellSize *cellNumber/2-125, cellSize *cellNumber/2-50, 250, 100)
+            draw_rounded_rect(screen, (255, 255, 255), rounded_rect)  # 50% transparent black
+            draw_text("You Won", BLACK, cellSize *cellNumber/2-105, cellSize *cellNumber/2-25, size=72)
+            #show_popup_message("You Won")  # Display pop-up window with "You Won" message
+            mainGame.reset_server()
+        
+        draw_rounded_rect(screen, exit_button_color, exit_button_rect)
+        draw_text("Exit", BLACK, cellSize *cellNumber/2-35, cellSize *cellNumber/2+90, size=48)
+            
+    #elif mainGame.player.you_win:
+
         
     hud = pygame.Rect(0,cellSize *cellNumber,cellSize *cellNumber,cellSize *cellNumber+50)
     pygame.draw.rect(screen, (125,125,125), hud)   
     draw_text(mainGame.player.name + " are player " + str(mainGame.player.id + 1), mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)
     draw_text("(Press Arrow Keys or 'W','A','S','D' to move)", mainGame.map.use_color[mainGame.player.id+1], 250, cellSize *cellNumber+12)
-    #draw_text("Note: press Arrow Keys or 'W','A','S','D' to move", 200, cellSize *cellNumber+12)
     
     pygame.display.update()
     clock.tick(60) #60 frame/second add comments properly

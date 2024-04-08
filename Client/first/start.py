@@ -6,21 +6,12 @@ import subprocess
 try: 
     from first.gameColor import COLORS
 except Exception as e:
+    print(e)
+    
+try: 
     from gameColor import COLORS
-
-
-#ADD NAME
-#AFTER CONNECTION BUG
-#NOTICE WHEN EMPTY NAME
-#NOTICE WHEN LOBBY FULL
-
-
-#TODO
-#Add Comments 
-#Remove Reset
-#Call RESET When game is over
-#Don't Start When There is only one player
-
+except Exception as e:
+    print(e)
 
 # Initialize Pygame
 pygame.init()
@@ -34,7 +25,7 @@ PROPERTY_DELIMETER = "▐";
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("- Tron Multiplayer Lobby 6-")
+pygame.display.set_caption("-- Tron Multiplayer Lobby --")
 
 # Load images
 background_image = pygame.image.load("Tron2.jpg").convert()  
@@ -56,6 +47,7 @@ posX = -1
 posY = -1
 name = ""
 arguments = ["","","","","",""]
+
 """
     Function to render text on the screen.
 """
@@ -110,8 +102,15 @@ def get_players_status(ip, port):
         
 
         player_statuses = filter(lambda status: status[0] != "IGNORE", split_data)
-        if all(sublist[0] == "R" for sublist in player_statuses) and all(sublist[0] != "NR" for sublist in player_statuses): #set start_game flag
+        player_statuses_list = list(player_statuses)
+
+            
+        #if all(sublist[0] == "R" for sublist in player_statuses) and all(sublist[0] != "NR" for sublist in player_statuses): #set start_game flag
+        if all(sublist[0] == "R" for sublist in player_statuses_list) and len(player_statuses_list) > 1:    
+            #print(len(player_statuses_list))
             start_game = True
+
+
 
         client_socket.close()
        
@@ -198,10 +197,11 @@ def connect_to_server(ip, port, _name):
     except Exception as e:
         print("Lobby Full:", e)
         return None
-# TO reset server   
+    
+# TO reset server  
+''' 
 def reset_server(ip, port):
     try:
-
         # Create a socket object
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
@@ -222,6 +222,8 @@ def reset_server(ip, port):
         
     except Exception as e:
         print("Connection error:", e)
+'''
+           
 # To Disconnect server         
 def disconnect_server(ip, port):
     try:
@@ -328,10 +330,10 @@ def main():
     
     
     # Reset button
-    reset_button_rect = pygame.Rect(50, 700, 200, 50)
-    reset_button_color = (0, 255, 0) if connect else (255, 0, 0)
-    reset_button_text = "Reset"
-    reset_button_text_color = WHITE
+    #reset_button_rect = pygame.Rect(50, 700, 200, 50)
+    #reset_button_color = (0, 255, 0) if connect else (255, 0, 0)
+    #reset_button_text = "Reset"
+    #reset_button_text_color = WHITE
     
     while True:    # Main loop for the lobby interface
 
@@ -369,7 +371,7 @@ def main():
 
         draw_button_with_rounded_corners(connect_button_text, connect_button_rect, connect_button_color, connect_button_text_color, connect_button_text_offsetX, radius=10)
 
-        draw_button_with_rounded_corners(reset_button_text, reset_button_rect, reset_button_color, reset_button_text_color, 65, radius=10)
+        #draw_button_with_rounded_corners(reset_button_text, reset_button_rect, reset_button_color, reset_button_text_color, 65, radius=10)
         
         # Event handling for user inputs
 
@@ -399,8 +401,8 @@ def main():
                         ip_active = False
                         port_active = False
                         
-                    elif reset_button_rect.collidepoint(event.pos):
-                        reset_server(ip_text, int(port_text))
+                    #elif reset_button_rect.collidepoint(event.pos):
+                    #    reset_server(ip_text, int(port_text))
                     
                     elif connect_button_rect.collidepoint(event.pos):
                         if ip_text and port_text and connect == False:
