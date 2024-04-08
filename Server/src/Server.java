@@ -7,18 +7,28 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-
+/**
+ * The Server class handles network connections and communicates with clients.
+ * It processes incoming requests and interacts with the GameManager to update game state.
+ */
 public class Server extends Thread {
 	public static final String PROPERTY_DELIMETER = "▐";
 	private ServerSocket serverSocket;
 	private GameManager gameManager;
-	
+  /**
+  * Constructs a new Server object that listens on the specified port.
+  * @param port The port number on which the server will listen.
+  * @throws IOException If an I/O error occurs when opening the socket.
+  */
 	public Server(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
 		serverSocket.setSoTimeout(0);
 		gameManager = new GameManager();
 	}
-	
+	 /**
+     * The main execution method for the server thread.
+     * Accepts client connections and processes their requests in a loop.
+     */	
 	public void run() {
 		while (true) {
 			try {
@@ -49,6 +59,11 @@ public class Server extends Thread {
 			}
 		}
 	}
+    /**
+     * Processes the input received from a client and generates an appropriate response.
+     * @param clientInput The string input received from the client.
+     * @return A response string based on the client input and game state.
+     */
 	
 	private String handleClientInput(String clientInput) {
 		System.out.println(clientInput);
