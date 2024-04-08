@@ -4,7 +4,7 @@ import pygame
 try: 
     from first.gameColor import COLORS 
 except Exception as e:
-    print(e)
+    pass
     
     
 try: 

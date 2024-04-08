@@ -7,14 +7,14 @@ try:
     from first.player import PLAYER
     from first.map import MAP
 except Exception as e:
-    print(e)
+    pass
 
 
 try: 
     from player import PLAYER
     from map import MAP
 except Exception as e:
-    print(e)
+    pass
 
 
 
@@ -215,7 +215,7 @@ class MAIN:
         except Exception as e:
             print("Connection error update:", e)
             
-    def gameOver(self):
+    def game_over(self):
         pygame.quit()
         sys.exit()
         
@@ -332,9 +332,9 @@ while True:
                 if mainGame.player.direction.x != -1:
                     mainGame.player.direction = Vector2(1,0)
         
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN and (not mainGame.player.alive or mainGame.player.you_win):
             if exit_button_rect.collidepoint(event.pos):
-                mainGame.gameOver()
+                mainGame.game_over()
                 
                 
     screen.fill((25,25,25))

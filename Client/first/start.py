@@ -6,12 +6,12 @@ import subprocess
 try: 
     from first.gameColor import COLORS
 except Exception as e:
-    print(e)
+    pass
     
 try: 
     from gameColor import COLORS
 except Exception as e:
-    print(e)
+    pass
 
 # Initialize Pygame
 pygame.init()
