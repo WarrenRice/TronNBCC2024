@@ -13,7 +13,6 @@ try:
 except Exception as e:
     pass
 
-
 # Initialize Pygame
 pygame.init()
 
