@@ -9,7 +9,7 @@ class COLORS:
         (255, 255, 255),  # 5 WHITE - Represents the color white in RGB format
     ]
 
-    def __getitem__(self, index):
-        # Retrieve color tuple by index, allowing the COLOR class to be used like an array
+    def __getitem__(self, index):        # Retrieve color tuple by index, allowing the COLOR class to be used like an array
+
         return self._colors[index]
     

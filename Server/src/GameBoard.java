@@ -18,7 +18,7 @@ public class GameBoard {
     
     /**
      * Constructor that initializes the game board with a specified size.
-     * @param size The width and height of the square game board.
+     *  size The width and height of the square game board.
      */
     public GameBoard(int size) {
         // Initialize the arena with the specified size, creating a square board
