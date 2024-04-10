@@ -26,7 +26,7 @@ PROPERTY_DELIMETER = "▐";                                                     
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("+- Tron Multiplayer Lobby -+")                                         # Set window caption
+pygame.display.set_caption("-+- Tron Multiplayer Lobby -+-")                                         # Set window caption
 
 # Load images 
 background_image = pygame.image.load("Tron2.jpg").convert()                                        # Load and convert background image
@@ -52,6 +52,7 @@ arguments = ["","","","","",""]                                                 
 no_name = False                                                                                     # Flag to indicate if the player has not entered a name
 lobby_full = False                                                                                  # Flag to indicate if the lobby is full
 invalid_ip = False
+no_ip = False
 
 # Set timeout value in seconds
 timeout = 2
@@ -132,7 +133,8 @@ def set_ready(ip, port):                                                        
         return None
 
 def connect_to_server(ip, port, _name, timeout=1):                                                                         # Function to connect to server
-    global id, posX, posY, lobby_full, invalid_ip, no_name
+    global id, posX, posY, lobby_full, invalid_ip, no_name, no_ip
+    
     
     try:
         
@@ -165,18 +167,20 @@ def connect_to_server(ip, port, _name, timeout=1):                              
         #print("posY:", posY)
         
     except Exception as e:
-        print("connect_to_server: ", e)
+        #print("connect_to_server: ", e)
         #print(e.args)
         #print(e.args[0] == 11001)
         if (e.args[0] == 'substring not found'):
             lobby_full = True
             no_name = False
             invalid_ip = False
+            no_ip = False
             return False
         else:    
             lobby_full = False
             no_name = False
             invalid_ip = True
+            no_ip = False
             return False
         
     client_socket.close()
@@ -240,7 +244,7 @@ def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, rad
     
 def main():                                                                                              # Main function controlling the lobby interface and logic
 
-    global id, posX, posY, start_game, name, arguments, no_name, lobby_full, invalid_ip                              # Initialize the main variables for the lobby state
+    global id, posX, posY, start_game, name, arguments, no_name, lobby_full, invalid_ip, no_ip           # Initialize the main variables for the lobby state
 
     
     state = "start"                                                                                      # Initial state of the lobby
@@ -261,7 +265,7 @@ def main():                                                                     
     
     port_input_box = pygame.Rect(250, 395, 140, 36)                                                     # Setup input boxes for  port
     port_color_inactive = pygame.Color('black')
-    port_color_active = pygame.Color('yellow')
+    #port_color_active = pygame.Color('yellow')
     port_color = port_color_inactive
     port_active = False
     port_text = '6066'
@@ -285,12 +289,13 @@ def main():                                                                     
     ready_button_text = "Ready"
     ready_button_text_color = WHITE
     
-    
+    '''
     # Reset button
-    #reset_button_rect = pygame.Rect(50, 700, 200, 50)
-    #reset_button_color = (0, 255, 0) if connect else (255, 0, 0)
-    #reset_button_text = "Reset"
-    #reset_button_text_color = WHITE
+    reset_button_rect = pygame.Rect(50, 700, 200, 50)
+    reset_button_color = (0, 255, 0) if connect else (255, 0, 0)
+    reset_button_text = "Reset"
+    reset_button_text_color = WHITE
+    '''
     
     while True:                                                                                        # Main loop for the lobby interface
 
@@ -359,9 +364,16 @@ def main():                                                                     
                     #    reset_server(ip_text, int(port_text))
                     
                     elif connect_button_rect.collidepoint(event.pos):                              # Check for click on connect button
-                        if ip_text and port_text and connect == False:                             # Ensure IP and port are entered
+                        if not ip_text:
+                            lobby_full = False
+                            invalid_ip = False
+                            no_name = False
+                            no_ip = True
+                        elif port_text and connect == False:                             # Ensure IP and port are entered
                             if name_text:                                                          # Check if the name is entered
                                 no_name = False
+                                draw_text("Try Connecting...", WHITE, 50, 570)
+                                pygame.display.flip()
                                 if connect_to_server(ip_text, int(port_text), name_text, timeout=1):          # Attempt to connect to the server
                                     state = "connected"                                            # Update state to connected
                                     connect = True                                                 # Set connect flag to True
@@ -372,11 +384,13 @@ def main():                                                                     
                                     lobby_full = False
                                     invalid_ip = False
                                     name_active = False
+                                    no_ip = False
 
                             else:
                                 no_name = True
                                 lobby_full = False
                                 invalid_ip = False
+                                no_ip = False
                                 
                 elif ready_button_rect.collidepoint(event.pos):                                     # Check for click on ready button
                         if state == "connected":
@@ -403,13 +417,13 @@ def main():                                                                     
                 if ip_active:                                                                       # Check if Ip input box is active
                     if event.key == pygame.K_BACKSPACE:                                
                         ip_text = ip_text[:-1]                                                      # Remove the last character
-                    else:                                   
+                    elif not event.key == pygame.K_SPACE:                                   
                         ip_text += event.unicode                                                    # Add the pressed key to the IP text
-                elif port_active:                                                                   # Check if port input box is active
-                    if event.key == pygame.K_BACKSPACE:                                
-                        port_text = port_text[:-1]                                                  # Remove the last character
-                    elif event.unicode.isdigit():                                                   # Add the pressed key to the Port text                                 
-                        port_text += event.unicode
+                #elif port_active:                                                                   # Check if port input box is active
+                #    if event.key == pygame.K_BACKSPACE:                                
+                #        port_text = port_text[:-1]                                                  # Remove the last character
+                #    elif event.unicode.isdigit():                                                   # Add the pressed key to the Port text                                 
+                #        port_text += event.unicode
                 elif name_active:                                                                   # Check if name input box is active
                     if event.key == pygame.K_BACKSPACE:                                
                         name_text = name_text[:-1]                                                  # Remove the last character
@@ -449,6 +463,8 @@ def main():                                                                     
             draw_text("Lobby is full...", WHITE, 50, 570)
         elif invalid_ip:
             draw_text("This IP is offline...", WHITE, 50, 570)
+        elif no_ip:
+            draw_text("IP must be filled...", WHITE, 50, 570)
         # Update the display
         pygame.display.flip()
         
