@@ -1,6 +1,6 @@
 import socket
 import sys
-import pygame
+#import pygame
 import subprocess
 #from first.gameColor import COLORS
 try: 
@@ -12,6 +12,15 @@ try:
     from gameColor import COLORS
 except Exception as e:
     pass
+    
+# Install Pygame
+try:
+    import pygame
+    print("Pygame is already installed.")
+except ImportError:
+    print("Installing Pygame...")
+    install("pygame")
+    print("Pygame has been installed.")
 
 # Initialize Pygame
 pygame.init()
@@ -222,6 +231,9 @@ def draw_rounded_rect(surface, color, rect, radius=10):                         
 def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, radius=10):                 # Function help to make rounded corner and txt color 
     draw_rounded_rect(screen, color, rect, radius)
     draw_text(text, text_color, rect.x + offsetX, rect.y + 12) 
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 def main():                                                                                              # Main function controlling the lobby interface and logic
 
