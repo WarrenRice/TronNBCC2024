@@ -2,6 +2,7 @@ import socket
 import sys
 import pygame
 import subprocess
+
 #from first.gameColor import COLORS
 try: 
     from first.gameColor import COLORS
@@ -25,7 +26,7 @@ PROPERTY_DELIMETER = "▐";                                                     
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("-- Tron Multiplayer Lobby --")                                         # Set window caption
+pygame.display.set_caption("+- Tron Multiplayer Lobby -+")                                         # Set window caption
 
 # Load images 
 background_image = pygame.image.load("Tron2.jpg").convert()                                        # Load and convert background image
@@ -48,22 +49,25 @@ posY = -1
 name = ""
 arguments = ["","","","","",""]                                                                     # Prepare arguments list for subprocess
 
+no_name = False                                                                                     # Flag to indicate if the player has not entered a name
+lobby_full = False                                                                                  # Flag to indicate if the lobby is full
+invalid_ip = False
+
+# Set timeout value in seconds
+timeout = 2
 
 def draw_text(ip_text, ip_color, x, y):                                                             # Function to draw text on the screen at specified coordinates
-
     ip_text_surface = font.render(ip_text, True, ip_color)                                          
     screen.blit(ip_text_surface, (x, y))                                                            
 
 
 def get_players_status(ip, port):                                                                   # Function to get player status
     global id, start_game;
-    try:
 
-        
+    try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)                            
         
         client_socket.connect((ip, port))                                                            
-        
         
         text = "GET_PLAYERS\n"                                                                       # Command to get players' status
         client_socket.sendall(text.encode())                                                         # Send the command to the server
@@ -127,12 +131,13 @@ def set_ready(ip, port):                                                        
         print("Connection error:", e)
         return None
 
-def connect_to_server(ip, port, _name):                                                                         # Function to connect to server
-    global id, posX, posY
+def connect_to_server(ip, port, _name, timeout=1):                                                                         # Function to connect to server
+    global id, posX, posY, lobby_full, invalid_ip, no_name
     
     try:
         
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.settimeout(timeout)  # Set timeout on the socket
         
         client_socket.connect((ip, port))
         
@@ -158,14 +163,24 @@ def connect_to_server(ip, port, _name):                                         
         #print("id:", id)
         #print("posX:", posX)
         #print("posY:", posY)
-                
-
-        client_socket.close()
-        return True
         
     except Exception as e:
-        print("Lobby Full:", e)
-        return None
+        print("connect_to_server: ", e)
+        #print(e.args)
+        #print(e.args[0] == 11001)
+        if (e.args[0] == 'substring not found'):
+            lobby_full = True
+            no_name = False
+            invalid_ip = False
+            return False
+        else:    
+            lobby_full = False
+            no_name = False
+            invalid_ip = True
+            return False
+        
+    client_socket.close()
+    return True    
     
 # TO reset server  
 ''' 
@@ -225,15 +240,13 @@ def draw_button_with_rounded_corners(text, rect, color, text_color, offsetX, rad
     
 def main():                                                                                              # Main function controlling the lobby interface and logic
 
-    global id, posX, posY, start_game, name, arguments                                                   # Initialize the main variables for the lobby state
+    global id, posX, posY, start_game, name, arguments, no_name, lobby_full, invalid_ip                              # Initialize the main variables for the lobby state
 
     
     state = "start"                                                                                      # Initial state of the lobby
     connect = False                                                                                      # Flag to indicate if the player is connected
     ready = False                                                                                        # Flag to indicate if the player is ready
     start_game = False                                                                                   # Flag to indicate if the game should start
-    no_name = False                                                                                     # Flag to indicate if the player has not entered a name
-    lobby_full = False                                                                                   # Flag to indicate if the lobby is full
 
 
     ip_input_box = pygame.Rect(250, 345, 140, 36)                                                        # Setup input boxes for IP
@@ -247,7 +260,7 @@ def main():                                                                     
     # ip_text = '25.34.232.141'
     
     port_input_box = pygame.Rect(250, 395, 140, 36)                                                     # Setup input boxes for  port
-    port_color_inactive = pygame.Color('gray')
+    port_color_inactive = pygame.Color('black')
     port_color_active = pygame.Color('yellow')
     port_color = port_color_inactive
     port_active = False
@@ -257,7 +270,7 @@ def main():                                                                     
     name_input_box = pygame.Rect(250, 445, 140, 36)                                                     # Setup input boxes for  player name
     name_color_inactive = pygame.Color('gray')
     name_color_active = pygame.Color('yellow')
-    name_color = port_color_inactive
+    name_color = name_color_inactive
     name_active = False
     name_text = name
     
@@ -296,7 +309,7 @@ def main():                                                                     
 
         draw_text("Enter Port:", WHITE, 50, 400)
         txt_surface = font.render(port_text, True, WHITE)
-        width = max(200, txt_surface.get_width()+10)
+        #width = max(200, txt_surface.get_width()+10)
         port_input_box.w = width
         screen.blit(txt_surface, (port_input_box.x+5, port_input_box.y+5))
         pygame.draw.rect(screen, port_color, port_input_box, 2)
@@ -332,10 +345,10 @@ def main():                                                                     
                         port_active = False
                         name_active = False
                         
-                    elif port_input_box.collidepoint(event.pos):                                   # Check for click in port input box
-                        port_active = not port_active                                              # Toggle the active state
-                        ip_active = False
-                        name_active = False
+                    #elif port_input_box.collidepoint(event.pos):                                   # Check for click in port input box
+                    #    port_active = not port_active                                              # Toggle the active state
+                    #    ip_active = False
+                    #    name_active = False
                     
                     elif name_input_box.collidepoint(event.pos):                                   # Check for click in name input box
                         name_active = not name_active                                              # Toggle the active state
@@ -349,7 +362,7 @@ def main():                                                                     
                         if ip_text and port_text and connect == False:                             # Ensure IP and port are entered
                             if name_text:                                                          # Check if the name is entered
                                 no_name = False
-                                if connect_to_server(ip_text, int(port_text), name_text):          # Attempt to connect to the server
+                                if connect_to_server(ip_text, int(port_text), name_text, timeout=1):          # Attempt to connect to the server
                                     state = "connected"                                            # Update state to connected
                                     connect = True                                                 # Set connect flag to True
                                     connect_button_color = (0, 255, 0) if connect else (255, 0, 0)
@@ -357,11 +370,14 @@ def main():                                                                     
                                     connect_button_text_color = BLACK
                                     connect_button_text_offsetX = 40
                                     lobby_full = False
-                                else:
-                                    lobby_full = True
+                                    invalid_ip = False
+                                    name_active = False
+
                             else:
                                 no_name = True
-
+                                lobby_full = False
+                                invalid_ip = False
+                                
                 elif ready_button_rect.collidepoint(event.pos):                                     # Check for click on ready button
                         if state == "connected":
                             state = "ready"
@@ -380,7 +396,7 @@ def main():                                                                     
                     name_active = False
                     
                 ip_color = ip_color_active if ip_active else ip_color_inactive                      # Check for key press event
-                port_color = port_color_active if port_active else port_color_inactive              # Check if IP input box is active
+                #port_color = port_color_active if port_active else port_color_inactive              # Check if IP input box is active
                 name_color = name_color_active if name_active else name_color_inactive              # Remove the last character
                 
             if event.type == pygame.KEYDOWN:                                                        # Add the pressed key to the IP text
@@ -421,7 +437,7 @@ def main():                                                                     
             
             #subprocess.run(["py", "game.py"] + arguments)
             subprocess.Popen(["py", "game.py"] + arguments)                                         # Start the game process
-
+            
             pygame.quit()
             sys.exit()
             
@@ -431,7 +447,8 @@ def main():                                                                     
             draw_text("Name must be filled...", WHITE, 50, 570)
         elif lobby_full:
             draw_text("Lobby is full...", WHITE, 50, 570)
-
+        elif invalid_ip:
+            draw_text("This IP is offline...", WHITE, 50, 570)
         # Update the display
         pygame.display.flip()
         

@@ -248,7 +248,7 @@ class MAIN:
 # Initialize Pygame and set up the display
 
 pygame.init()                                                                                             # Initialize all imported Pygame modules
-cellSize = 8                                                                                              #16 # Define the size of each cell on the grid
+cellSize = 6                                                                                              #16 # Define the size of each cell on the grid
 cellNumber = 100                                                                                          #40 # Define the number of cells in the grid
 screen = pygame.display.set_mode((cellSize *cellNumber,cellSize *cellNumber + 50))                        # Set up the display window
 clock = pygame.time.Clock()                                                                               # Create a clock object to manage updates
@@ -323,7 +323,6 @@ while True:                                                                     
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:                                                                         # Handle window close event
-
             mainGame.player.alive = False
             mainGame.set_dead()
             pygame.quit()
@@ -380,9 +379,9 @@ while True:                                                                     
         
     hud = pygame.Rect(0,cellSize *cellNumber,cellSize *cellNumber,cellSize *cellNumber+50)                      # Define the HUD area
     pygame.draw.rect(screen, (125,125,125), hud)                                                                # Draw the HUD background
-    draw_text(mainGame.player.name + " are player " + str(mainGame.player.id + 1), mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)# Show player information
+    draw_text(mainGame.player.name + " (player" + str(mainGame.player.id + 1) + ")", mainGame.map.use_color[mainGame.player.id+1], 20, cellSize *cellNumber+12)# Show player information
 
-    draw_text("(Press Arrow Keys or 'W','A','S','D' to move)", mainGame.map.use_color[mainGame.player.id+1], 250, cellSize *cellNumber+12)# Show movement instructions
+    draw_text("(Press Arrows or W,A,S,D to move)", WHITE, 300, cellSize *cellNumber+16, size=24)# Show movement instructions
     
     pygame.display.update()
     clock.tick(60)                                                                                              #60 frame/second add comments properly
