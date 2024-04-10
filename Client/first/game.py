@@ -16,8 +16,6 @@ try:
 except Exception as e:
     pass
 
-
-
 # Constants and global variables
 
 PROPERTY_DELIMETER = "▐";# Define a delimiter for parsing server messages
@@ -36,8 +34,8 @@ class MAIN:
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]),arguments[5])
         self.map = MAP(size)
         self.load_map("maps/map2.txt")# Load the map from a specified file
-    # Load map data from a specified file and set map values accordingly
 
+    # Load map data from a specified file and set map values accordingly
     def load_map(self, file_path):
         try:# Load map data from a text file and set map values
             with open(file_path, 'r') as file:# Open the file for reading
@@ -67,8 +65,6 @@ class MAIN:
         if self.player.alive: # Update game state, handling player movement, collisions, and networking
             if not self.player.you_win:  # Handle player movement and interactions
 
-                
-    
                 try:# Establish a network connection to save player position
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
