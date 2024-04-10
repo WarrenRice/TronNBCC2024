@@ -127,7 +127,7 @@ def set_ready(ip, port):                                                        
         print("Connection error:", e)
         return None
 
-def connect_to_server(ip, port, _name):                                                                      # Function to connect to server
+def connect_to_server(ip, port, _name):                                                                         # Function to connect to server
     global id, posX, posY
     
     try:

@@ -16,13 +16,7 @@ try:
 except Exception as e:
     pass
 
-<<<<<<< HEAD
 # Constants and global variables
-=======
-
-
->>>>>>> 3b1c40b5a8ed7e897e7df74ad175928cd7864399
-
 PROPERTY_DELIMETER = "▐";                                                                       # Define a delimiter for parsing server messages
 
 arguments = sys.argv[1:]                                                                         # Exclude the first argument, which is the script filename
@@ -37,12 +31,8 @@ class MAIN:
 
         self.player = PLAYER(int(arguments[0]),int(arguments[1]),int(arguments[2]),arguments[5])
         self.map = MAP(size)
-<<<<<<< HEAD
-        self.load_map("maps/map2.txt")# Load the map from a specified file
-=======
         self.load_map("maps/map2.txt")                                                          # Load the map from a specified file
-    # Load map data from a specified file and set map values accordingly
->>>>>>> 3b1c40b5a8ed7e897e7df74ad175928cd7864399
+
 
     # Load map data from a specified file and set map values accordingly
     def load_map(self, file_path):
@@ -74,13 +64,8 @@ class MAIN:
         if self.player.alive:                                                                    # Update game state, handling player movement, collisions, and networking
             if not self.player.you_win:                                                          # Handle player movement and interactions
 
-<<<<<<< HEAD
-                try:# Establish a network connection to save player position
-=======
-                
-    
                 try:                                                                             # Establish a network connection to save player position
->>>>>>> 3b1c40b5a8ed7e897e7df74ad175928cd7864399
+
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client_socket.connect((SERVER_ADDRESS, SERVER_PORT))
                     message = "SAVE_POSITION" + PROPERTY_DELIMETER + str(self.player.id) + PROPERTY_DELIMETER + str(int(self.player.pos.x)) + PROPERTY_DELIMETER + str(int(self.player.pos.y)) + "\n"
